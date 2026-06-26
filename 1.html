@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 — Ticket Research</title>
+<style>
+  :root{
+    --navy:#202060;--purple:#9e62dd;--purple-deep:#6738b8;--ink:#1d1d2b;
+    --muted:#5b5b73;--line:#e7e3f3;--card:#ffffff;--bg:#f6f4fc;
+    --warn-bg:#fff7ed;--warn-bd:#fdba74;--tip-bg:#f3eefc;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Source Sans Pro','Source Sans 3',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px 40px}
+  .band{background:linear-gradient(135deg,#16103a 0%,#202060 55%,#3a2580 100%);color:#fff;padding:32px 32px 26px;border-radius:0 0 18px 18px}
+  .band .inner{max-width:860px;margin:0 auto;padding:0 12px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#cdbdf0;font-weight:600;margin-bottom:10px}
+  .band h1{font-size:26px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+  .band h1 .accent{color:var(--purple)}
+  .band .meta{margin-top:11px;font-size:14px;color:#d9d2f2}
+  .band .meta b{color:#fff;font-weight:600}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:4px;flex-wrap:wrap;padding:12px 20px 0;max-width:860px;margin:0 auto}
+  .tabbtn{appearance:none;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:9px 15px;border-radius:9px 9px 0 0;position:relative;transition:color .15s;white-space:nowrap}
+  .tabbtn:hover{color:var(--purple-deep)}
+  .tabbtn.active{color:var(--navy)}
+  .tabbtn.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:3px;background:var(--purple);border-radius:3px 3px 0 0}
+  .panel{display:none;animation:fade .2s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-deep);font-weight:700;margin:24px 0 12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:0 1px 2px rgba(32,32,96,.04)}
+  p{margin:0 0 12px;color:#33333f}
+  p:last-child{margin-bottom:0}
+  ol.steps{counter-reset:s;list-style:none;margin:0}
+  ol.steps li{position:relative;padding:8px 0 8px 40px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:none}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .tags{display:grid;gap:10px;margin-top:14px}
+  .tag{display:flex;gap:10px;align-items:flex-start;background:#faf8fe;border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .tag .q{color:var(--purple-deep);font-weight:700;font-size:15px;line-height:1.3;flex-shrink:0}
+  .tag span{font-size:14.5px;color:#3a3a48}
+  .pattern{border-left:3px solid var(--purple);padding:8px 0 8px 14px;margin:0 0 13px}
+  .pattern:last-child{margin-bottom:0}
+  .pattern b{color:var(--navy);font-weight:700}
+  .pattern span{color:#4a4a5a}
+  .anti-grid{display:grid;gap:11px}
+  .anti-item{border-left:3px solid #e0719b;padding:7px 0 7px 14px}
+  .anti-item b{color:#b03a68;font-weight:700}
+  .anti-item span{color:#4a4a5a}
+  .callout{display:flex;gap:11px;border-radius:11px;padding:13px 15px;margin:14px 0 0;font-size:14.5px}
+  .callout.tip{background:var(--tip-bg);border:1px solid var(--line)}
+  .callout.warn{background:var(--warn-bg);border:1px solid var(--warn-bd)}
+  .callout .ico{font-size:17px;line-height:1.4;flex-shrink:0}
+  .callout b{color:var(--navy)}
+  .feeds{display:grid;gap:9px}
+  .feed{display:flex;gap:11px;align-items:baseline;padding:9px 13px;background:#faf8fe;border:1px solid var(--line);border-radius:10px}
+  .feed .ph{font-size:11px;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--purple-deep);padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+  .feed span{font-size:14.5px;color:#3a3a48}
+  .foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);text-align:center}
+  .foot b{color:var(--purple-deep)}
+</style>
+</head>
+<body>
+  <div class="band">
+    <div class="inner">
+      <div class="eyebrow">June Sprint · Confidence in Front of Customers · Phase 1</div>
+      <h1>🔍 Ticket Research — <span class="accent">Sev 1 / escalation threads</span></h1>
+      <div class="meta">Pair 1 · <b>Dimitris &amp; Leonardo</b> · Owner: Both · Target: 13 Jun</div>
+    </div>
+  </div>
+
+  <div class="tabbar" id="tabbar">
+    <button class="tabbtn active" data-tab="goal">Goal</button>
+    <button class="tabbtn" data-tab="method">Method</button>
+    <button class="tabbtn" data-tab="patterns">Discomfort patterns</button>
+    <button class="tabbtn" data-tab="anti">Anti-patterns</button>
+    <button class="tabbtn" data-tab="feeds">What this feeds</button>
+  </div>
+
+  <div class="wrap">
+    <section class="panel active" id="goal">
+      <h2>Goal</h2>
+      <div class="card">
+        <p>Find what actually holds a customer relationship steady during a live, unresolved incident — and what fractures it — by reading real escalation threads rather than guessing.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="method">
+      <h2>Method</h2>
+      <div class="card">
+        <ol class="steps">
+          <li>Started from three years of escalation and urgent tickets.</li>
+          <li>Filtered to genuine customer-frustration arcs: live incidents where the customer was anxious or angry and the relationship was at stake while the work was still unresolved.</li>
+          <li>Read each thread end to end and tagged it against four questions.</li>
+        </ol>
+        <div class="tags">
+          <div class="tag"><span class="q">1</span><span>What did the customer actually need to hear, versus the literal question they asked?</span></div>
+          <div class="tag"><span class="q">2</span><span>Was a next-update time given — and was it kept?</span></div>
+          <div class="tag"><span class="q">3</span><span>How was the reactive-to-reassuring pivot handled, or wasn't it?</span></div>
+          <div class="tag"><span class="q">4</span><span>Did the close land honestly, or transactionally?</span></div>
+        </div>
+        <div class="callout warn">
+          <span class="ico">⚠️</span>
+          <span>Findings are generalised. Real names, figures, and internal notes are stripped before any reuse.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="patterns">
+      <h2>Escalation &amp; discomfort patterns we found</h2>
+      <div class="card">
+        <p style="margin-bottom:16px">The threads that turned tense shared a recognisable shape. These are the signals a conversation is slipping, whatever the underlying incident:</p>
+        <div class="pattern"><b>The repeated follow-up.</b> <span>The customer chases two or three times before a substantive reply. By the third message the tone hardens, and the original issue is compounded by feeling ignored.</span></div>
+        <div class="pattern"><b>"This is business-critical."</b> <span>The customer states impact explicitly because they don't feel it's been registered. Having to say it twice escalates frustration fast.</span></div>
+        <div class="pattern"><b>The silence gap.</b> <span>A stretch with no update during active work. The customer fills the silence with worst-case assumptions, and trust drops even if the fix is progressing.</span></div>
+        <div class="pattern"><b>The data-loss fear.</b> <span>Underneath most incidents is one unspoken question: "is our data gone?" Threads that left it unanswered stayed tense; threads that addressed it early calmed down.</span></div>
+        <div class="pattern"><b>Looping in leadership.</b> <span>The customer CCs their manager or ours. The clearest signal the relationship, not just the ticket, is now at risk.</span></div>
+        <div class="pattern"><b>"This keeps happening."</b> <span>A recurring issue carries the weight of every prior occurrence. A fix-only reply reads as dismissive.</span></div>
+        <div class="pattern"><b>The unanswered "why."</b> <span>When a preventable cause surfaces, the customer wants to know why it happened and what stops a repeat. Skipping that turns relief into renewed frustration.</span></div>
+        <div class="callout tip">
+          <span class="ico">💡</span>
+          <span>The common thread: discomfort spikes when the customer feels <b>unheard, uninformed, or unsure their data is safe</b> — more than from the incident itself.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="anti">
+      <h2>Anti-patterns — what fractures the relationship</h2>
+      <div class="card">
+        <div class="anti-grid">
+          <div class="anti-item"><b>The non-answer.</b> <span>"Looking into it," no owner, no timeline. Reads like an auto-reply.</span></div>
+          <div class="anti-item"><b>Premature blame.</b> <span>Questioning the customer's setup before diagnosing. Burns trust in the first reply.</span></div>
+          <div class="anti-item"><b>The silence.</b> <span>Going quiet mid-incident. No update is itself an update, and it says "we forgot you."</span></div>
+          <div class="anti-item"><b>The defensive pivot.</b> <span>Meeting frustration with "we follow best practice" instead of acknowledging impact.</span></div>
+          <div class="anti-item"><b>The transactional close.</b> <span>Marked resolved, no cause named, no door left open.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="feeds">
+      <h2>What this feeds</h2>
+      <div class="card">
+        <div class="feeds">
+          <div class="feed"><span class="ph">Phase 2</span><span>The four tags and the discomfort patterns become the backbone of the H.E.A.R. framework.</span></div>
+          <div class="feed"><span class="ph">Phase 3</span><span>The strongest real replies become the "strong" side of each weak-vs-strong language pair.</span></div>
+          <div class="feed"><span class="ph">Phase 5</span><span>The patterns above define what makes each practice scenario feel real.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot"><b>Snowplow</b> · Customer Support Knowledge Sprint · June 2026</div>
+  </div>
+
+<script>
+  (function(){
+    var bar=document.getElementById('tabbar');
+    var btns=bar.querySelectorAll('.tabbtn');
+    var panels=document.querySelectorAll('.panel');
+    bar.addEventListener('click',function(e){
+      var b=e.target.closest('.tabbtn');
+      if(!b)return;
+      var t=b.dataset.tab;
+      btns.forEach(function(x){x.classList.toggle('active',x===b);});
+      panels.forEach(function(p){p.classList.toggle('active',p.id===t);});
+    });
+  })();
+</script>
+</body>
+</html>
