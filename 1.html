@@ -1,1 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sev 1 Under Pressure — Pair 1 Deliverable</title>
+<style>
+  :root{
+    --navy:#202060;--purple:#9e62dd;--purple-deep:#6738b8;--ink:#1d1d2b;
+    --muted:#5b5b73;--line:#e7e3f3;--card:#ffffff;--bg:#f6f4fc;
+    --warn-bg:#fff7ed;--warn-bd:#fdba74;--tip-bg:#f3eefc;
+    --weak-bd:#e0719b;--strong-bd:#4caf7d;--strong-bg:#f0faf4;--weak-bg:#fdf1f5;
+    --code-bg:#1d1d2b;--code-ink:#e9e6f5;
+    /* aliases used by the ported practice engine */
+    --purple-bright:#9e62dd;--purple-d:#6738b8;--res-c:#4caf7d;--hold-c:#c78a2a;--weak-tx:#b03a68;--line2:#e7e3f3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Source Sans Pro','Source Sans 3',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px 56px}
 
+  /* top tab bar */
+  .toptabs{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:2px solid var(--line);display:flex;gap:2px;flex-wrap:nowrap;overflow-x:auto;padding:14px 20px 0;max-width:900px;margin:0 auto;scrollbar-width:none}
+  .toptabs::-webkit-scrollbar{display:none}
+  .toptab{appearance:none;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;color:var(--muted);padding:11px 12px;border-radius:10px 10px 0 0;position:relative;white-space:nowrap;flex:0 1 auto;min-width:0;transition:color .15s}
+  @media (max-width:880px){.toptabs{padding-left:12px;padding-right:12px}.toptab{font-size:12.5px;padding:10px 8px}}
+  @media (max-width:680px){.toptab{font-size:11px;padding:9px 6px;letter-spacing:-.01em}}
+  .toptab:hover{color:var(--purple-deep)}
+  .toptab.active{color:#fff;background:linear-gradient(135deg,#202060,#3a2580)}
+  .topview{display:none;animation:fade .2s ease}
+  .topview.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* hero */
+  .hero{padding:30px 0 6px}
+  .hero .ph{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple-deep);font-weight:700}
+  .hero h1{font-size:30px;font-weight:600;color:var(--navy);margin-top:7px;letter-spacing:-.015em;line-height:1.15}
+  .hero .meta{font-size:14px;color:var(--muted);margin-top:9px}
+  .lede{background:linear-gradient(135deg,#202060,#3a2580);color:#efe9fb;border-radius:14px;padding:20px 22px;margin-top:18px;font-size:16px;line-height:1.5}
+  .lede b{color:#fff}
+
+  .vhead{padding:24px 0 4px}
+  .vhead .ph{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple-deep);font-weight:700}
+  .vhead h1{font-size:23px;font-weight:600;color:var(--navy);margin-top:5px;letter-spacing:-.01em}
+  .vhead .meta{font-size:13.5px;color:var(--muted);margin-top:5px}
+
+  /* sub tab bar */
+  .subtabs{display:flex;gap:3px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:16px 0 0}
+  .subtab{appearance:none;border:none;background:transparent;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);padding:8px 13px;border-radius:8px 8px 0 0;position:relative;white-space:nowrap;transition:color .15s}
+  .subtab:hover{color:var(--purple-deep)}
+  .subtab.active{color:var(--navy)}
+  .subtab.active::after{content:"";position:absolute;left:11px;right:11px;bottom:-1px;height:3px;background:var(--purple);border-radius:3px 3px 0 0}
+  .subview{display:none;animation:fade .2s ease}
+  .subview.active{display:block}
+
+  /* vertical sub-tabs (scoped to sections that opt in via .vtabs) */
+  .vtabs{display:grid;grid-template-columns:200px 1fr;gap:22px;margin-top:18px;align-items:start}
+  .vtabs .subtabs{flex-direction:column;border-bottom:none;border-right:1px solid var(--line);margin:0;padding-right:14px;gap:2px;position:sticky;top:74px}
+  .vtabs .subtab{text-align:left;width:100%;border-radius:8px;padding:10px 13px}
+  .vtabs .subtab.active{color:#fff;background:linear-gradient(135deg,#202060,#3a2580)}
+  .vtabs .subtab.active::after{display:none}
+  .vtabs .subtab:hover:not(.active){color:var(--purple-deep);background:#f3eefc}
+  .vtabs .vpanel{min-width:0}
+  .lead-line{font-size:17px;line-height:1.45;color:var(--muted);margin:0 0 16px;padding-left:14px;border-left:3px solid var(--purple)}
+  .lead-line b{color:var(--navy);font-weight:700}
+  @media (max-width:640px){
+    .vtabs{grid-template-columns:1fr;gap:0}
+    .vtabs .subtabs{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--line);padding-right:0;position:static}
+    .vtabs .subtab{width:auto}
+  }
+
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--purple-deep);font-weight:700;margin:26px 0 12px}
+  h2:first-child{margin-top:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:0 1px 2px rgba(32,32,96,.04);margin-bottom:14px}
+  .card h3{font-size:16px;color:var(--navy);font-weight:700;margin:0 0 10px}
+  .card h3.sp{margin-top:18px}
+  .card h4.kb-step{font-size:15px;color:var(--purple-deep);font-weight:700;margin:18px 0 8px}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .twocol .col{padding:0 20px}
+  .twocol .col:first-child{padding-left:0;border-right:1px solid var(--line)}
+  .twocol .col:last-child{padding-right:0}
+  .twocol .col .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+  .twocol .col.is .lbl{color:#2f8f63}
+  .twocol .col.isnot .lbl{color:#b03a68}
+  @media (max-width:560px){.twocol{grid-template-columns:1fr;gap:16px}.twocol .col{padding:0}.twocol .col:first-child{border-right:none;border-bottom:1px solid var(--line);padding-bottom:16px}}
+  p{margin:0 0 12px;color:#33333f}
+  p:last-child{margin-bottom:0}
+  ul.bul{margin:0;padding-left:20px}
+  ul.bul li{margin:0 0 8px;color:#3a3a48}
+  ul.bul li:last-child{margin-bottom:0}
+  ul.bul li b{color:var(--navy)}
+
+  .hear{display:grid;gap:11px;margin-top:4px}
+  .hstep{display:flex;gap:13px;align-items:flex-start;background:#faf8fe;border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+  .hstep .letter{font-size:22px;font-weight:800;color:var(--purple);line-height:1;width:26px;flex-shrink:0;text-align:center}
+  .hstep .htext b{color:var(--navy);font-weight:700}
+  .hstep .htext span{color:#43434f;font-size:14.5px}
+
+  .cycle{display:flex;justify-content:center;background:#0C0517;border:1px solid #2a2150;border-radius:14px;padding:22px 16px;margin-top:4px;background-image:radial-gradient(circle at 50% 42%, rgba(158,98,221,.16), transparent 62%)}
+  .cycle svg{width:100%;max-width:520px;height:auto;display:block}
+  .cycle .seg-label{font-size:17px;font-weight:600;fill:#ffffff}
+  .cycle .seg-sub{font-size:13px;fill:#b0b0c0}
+  .cycle .seg-num{font-size:18px;font-weight:700;fill:#ffffff}
+  .cycle .ring-cap{font-size:13px;font-weight:700;fill:#9e62dd;letter-spacing:.1em;text-transform:uppercase}
+  .cycle .ring-cap2{font-size:19px;font-weight:600;fill:#ffffff}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f3eefc;color:var(--navy);font-weight:700;font-size:12.5px;letter-spacing:.02em}
+  td{color:#3d3d4a}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--navy)}
+
+  .dp{background:var(--tip-bg);border:1px solid var(--line);border-radius:10px;padding:12px 15px;font-size:14px;color:#3a3a48;margin-top:12px}
+  .dp b{color:var(--navy)}
+
+  .callout{display:flex;gap:11px;border-radius:11px;padding:13px 15px;margin:14px 0 0;font-size:14.5px}
+  .callout.tip{background:var(--tip-bg);border:1px solid var(--line)}
+  .callout.warn{background:var(--warn-bg);border:1px solid var(--warn-bd)}
+  .callout.fact{background:linear-gradient(135deg,#f3eefc,#faf6ff);border:1px solid var(--purple)}
+  .callout .ico{font-size:17px;flex-shrink:0}
+  .callout b{color:var(--navy)}
+
+  /* weak/strong language */
+  .lang{display:grid;gap:14px}
+  .pair{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .pair .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px}
+  .pair .weak .lbl{color:#b03a68}
+  .pair .strong .lbl{color:#2f8f63}
+  .pair .weak{background:var(--weak-bg);border-bottom:1px solid var(--line)}
+  .pair .strong{background:var(--strong-bg)}
+  .pair .txt{padding:0 14px 12px;font-size:14.5px;color:#33333f}
+  .pair .weak .txt{font-style:italic}
+
+  .worked{border-left:3px solid var(--purple);padding:4px 0 4px 14px;margin:0 0 14px}
+  .worked:last-child{margin-bottom:0}
+  .worked b{color:var(--navy);display:block;margin-bottom:3px;font-size:14px}
+  .worked span{color:#41414f;font-size:14.5px}
+
+  /* macros */
+  .macro-name{display:inline-block;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:13px;font-weight:700;color:var(--purple-deep);background:#f3eefc;border:1px solid var(--line);border-radius:7px;padding:4px 10px;margin-bottom:4px}
+  .macro-use{font-size:13.5px;color:var(--muted);margin:0 0 10px}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:11px;padding:16px 18px;overflow-x:auto;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:13px;line-height:1.5;margin:0 0 16px}
+  pre .ph{color:#c8a6f0}
+
+  /* run of show */
+  .seg{display:flex;gap:13px;align-items:flex-start;background:#faf8fe;border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin-bottom:10px}
+  .seg:last-child{margin-bottom:0}
+  .seg .n{font-size:13px;font-weight:700;color:#fff;background:var(--purple);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .seg .who{font-size:12px;font-weight:700;color:var(--purple-deep);margin-top:2px}
+  .seg .st{font-size:14.5px;color:#3a3a48}
+
+  .takeaway{background:linear-gradient(135deg,#202060,#3a2580);color:#efe9fb;border-radius:12px;padding:16px 18px;margin-top:14px;font-size:15px;line-height:1.5}
+  .takeaway b{color:#fff}
+
+  /* practice role-play (ported from the team artifact, re-skinned to this palette) */
+  .pr-wrap{max-width:760px}
+  .pr-meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:13px;color:var(--muted)}
+  .pr-meta .mono{font-family:'SFMono-Regular',Consolas,Menlo,monospace;font-size:12px;color:var(--muted)}
+  .pr-phasebar{display:flex;gap:6px;margin-bottom:18px}
+  .pr-phasebar .seg{flex:1;height:5px;border-radius:3px;background:var(--line)}
+  .pr-mood{display:flex;align-items:center;gap:10px;background:#faf8fe;border:1px solid var(--line);border-radius:10px;padding:9px 14px;margin-bottom:18px}
+  .pr-mood .lbl{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .pr-mood .bar{flex:1;height:8px;border-radius:5px;background:#ece7f6;overflow:hidden}
+  .pr-mood .fill{height:100%;border-radius:5px;transition:width .5s ease,background .5s ease}
+  .pr-mood .face{font-size:18px}
+  .pr-chat{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+  .pr-msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.55}
+  .pr-cust{align-self:flex-start;background:#faf8fe;border:1px solid var(--line);border-bottom-left-radius:4px;color:#33333f}
+  .pr-you{align-self:flex-end;background:#f0eafc;border:1px solid var(--line);border-bottom-right-radius:4px;color:#33333f}
+  .pr-who{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 3px}
+  .pr-scene{font-size:13px;color:var(--muted);font-style:italic;text-align:center;margin:4px 0 14px;padding:0 1rem}
+  .pr-prompt{font-size:14.5px;font-weight:700;color:var(--navy);margin:0 0 12px}
+  .pr-choices{display:flex;flex-direction:column;gap:10px}
+  .pr-choice{text-align:left;font-family:inherit;font-size:14px;line-height:1.5;color:#33333f;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .12s,background .12s}
+  .pr-choice:hover{border-color:var(--purple);background:#faf6ff}
+  .pr-choice:disabled{cursor:default;opacity:.55}
+  .pr-choice.picked-good{border-color:var(--strong-bd);background:var(--strong-bg)}
+  .pr-choice.picked-bad{border-color:var(--weak-bd);background:var(--weak-bg)}
+  .pr-fb{border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13.5px;line-height:1.6;color:#3a3a48}
+  .pr-fb.good{background:var(--strong-bg);border-left:3px solid var(--strong-bd)}
+  .pr-fb.bad{background:var(--weak-bg);border-left:3px solid var(--weak-bd)}
+  .pr-fb .fb-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+  .pr-fb.good .fb-tag{color:#2f8f63}
+  .pr-fb.bad .fb-tag{color:#b03a68}
+  .pr-btn{font-family:inherit;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#202060,#3a2580);border:none;border-radius:9px;padding:11px 20px;cursor:pointer;margin-top:16px;transition:filter .12s}
+  .pr-btn:hover{filter:brightness(1.12)}
+  .pr-btn.ghost{background:transparent;color:var(--purple-deep);border:1px solid var(--line)}
+  .pr-result{background:#faf8fe;border:1px solid var(--line);border-top:3px solid var(--purple);border-radius:14px;padding:1.5rem;text-align:center}
+  .pr-result h3{font-size:21px;font-weight:600;margin:0 0 8px;color:var(--navy)}
+  .pr-result .score{font-size:40px;font-weight:700;color:var(--purple-deep);margin:8px 0}
+  .pr-result p{font-size:14px;color:var(--muted);margin:8px auto 0;max-width:48ch;line-height:1.6}
+  .pr-resetbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .pr-scenario-name{font-size:14px;font-weight:700;color:var(--navy)}
+  .pr-scenario-meta{font-weight:400;color:var(--muted);font-size:12.5px}
+  .pr-reset{font-family:inherit;font-size:12.5px;font-weight:700;color:var(--purple-deep);background:#f3eefc;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;transition:background .12s}
+  .pr-reset:hover{background:#e9def9}
+
+  .pattern{border-left:3px solid var(--purple);padding:8px 0 8px 14px;margin:0 0 13px}
+  .pattern:last-child{margin-bottom:0}
+  .pattern b{color:var(--navy);font-weight:700}
+  .pattern span{color:#4a4a5a}
+  .anti-item{border-left:3px solid var(--weak-bd);padding:7px 0 7px 14px;margin-bottom:11px}
+  .anti-item:last-child{margin-bottom:0}
+  .anti-item b{color:#b03a68;font-weight:700}
+  .anti-item span{color:#4a4a5a}
+  .feeds{display:grid;gap:9px}
+  .feed{display:flex;gap:11px;align-items:baseline;padding:9px 13px;background:#faf8fe;border:1px solid var(--line);border-radius:10px}
+  .feed .ph2{font-size:11px;font-weight:700;color:#fff;background:var(--purple-deep);padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+  .feed span{font-size:14.5px;color:#3a3a48}
+
+  .sources{font-size:13.5px;color:var(--muted);line-height:1.9}
+  .sources a{color:var(--purple-deep);text-decoration:none}
+  .sources a:hover{text-decoration:underline}
+
+  .foot{margin-top:36px;padding-top:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .foot .foot-logo{height:18px;width:auto;display:block}
+  .foot .foot-mid{font-size:10px;color:#9B9BB3;letter-spacing:.02em}
+  .foot .foot-right{font-size:11px;font-weight:600;color:#202060;text-decoration:none}
+  .foot .foot-right:hover{color:#6738B8}
+  @media (max-width:560px){.foot{justify-content:center;text-align:center}}
+
+  @media (max-width:560px){
+    .hero h1{font-size:25px}
+  }
+</style>
+</head>
+<body>
+
+<div class="toptabs" id="toptabs">
+  <button class="toptab active" data-v="v0">🎯 Overview</button>
+  <button class="toptab" data-v="v1">🧭 Structured approach</button>
+  <button class="toptab" data-v="v2">💬 Example language</button>
+  <button class="toptab" data-v="v3">⚙️ Macro / playbook</button>
+  <button class="toptab" data-v="v4">🎤 Live demo</button>
+  <button class="toptab" data-v="v5">🔍 How we built this</button>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== OVERVIEW ===== -->
+  <section class="topview active" id="v0">
+    <div class="hero">
+      <h1>🔴 Confidence in Front of Customers — Sev 1 Under Pressure</h1>
+      <div class="meta">Created by Dimitris Zoutsos + Leonardo Malaver</div>
+      <div class="lede">The clock is running, the customer is frightened or furious, and there's no fix yet. Diagnosing the incident is the easy part. <b>The hard part is holding the relationship steady while the work is still live</b> — shifting from reactive to reassuring before you have an answer.</div>
+    </div>
+
+    <div class="card">
+      <div class="twocol">
+        <div class="col is">
+          <div class="lbl">✅ What this is</div>
+          <p>A usable, customer-facing reference for the live-incident conversation — the structured approach, tested example language, two Zendesk macros, and the All Hands demo.</p>
+        </div>
+        <div class="col isnot">
+          <div class="lbl">❌ What this is not</div>
+          <p>A technical runbook for fixing incidents. It runs alongside the <a href="https://app.notion.com/p/26dbfb9e96884803b655cbfa14e26e96">Incident Response Process</a> and <a href="https://app.notion.com/p/b6f8973ec810401283c3fd92e3e5ae6b">Response Checklist</a>, which cover how to run the incident itself. The diagnosis is assumed; this is the human side while the fix is still in progress.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>The one fact that shapes everything</h2>
+    <div class="card">
+      <p>We commit to a <b>first response</b> time, not a resolution time.</p>
+      <table>
+        <tr><th>Severity</th><th>Description</th><th>Standard</th><th>Enhanced</th></tr>
+        <tr><td><b>1 (Urgent)</b></td><td>Product is not functioning reliably or securely in a production environment, making the service unusable with no alternative available.</td><td>1 hour</td><td>0.5 hour</td></tr>
+        <tr><td><b>2 (High)</b></td><td>Significant product functionality is affected, unusable or unreliable in a production environment. A workaround might exist but is complex or unreliable.</td><td>8 hours</td><td>1 hour</td></tr>
+      </table>
+      <div class="callout fact"><span class="ico">📌</span><span>So you can promise attention, ownership, and care. You <b>cannot</b> promise a fix time you don't control. Every step in this deliverable follows from that.</span></div>
+      <p style="margin-top:14px">A Sev 1 is anything that materially affects a customer's ability to get their data where they need it, when they need it. The internal rule: if in doubt, raise it as an incident and sort out the technicalities later. Better to over-serve and downgrade than to under-serve.</p>
+    </div>
+
+    <h2>What's in here</h2>
+    <div class="card"><ul class="bul">
+      <li><b>Structured approach</b> — the incident cycle, the H.E.A.R. framework, and how the tone shifts as the incident matures.</li>
+      <li><b>Example language</b> — weak vs strong lines per phase, plus longer worked examples from real Sev 1 handling.</li>
+      <li><b>Macro / playbook entry</b> — two ready-to-use Zendesk macros and what the wider playbook covers.</li>
+      <li><b>Live demo</b> — the All Hands run of show and the interactive practice tool.</li>
+      <li><b>The method behind it</b> — the ticket research and phase work this was built from.</li>
+    </ul></div>
+  </section>
+
+  <!-- ===== STRUCTURED APPROACH ===== -->
+  <section class="topview" id="v1">
+    <div class="vhead"><h1>🧭 The structured approach</h1></div>
+
+    <div class="vtabs">
+      <div class="subtabs" data-group="v1">
+        <button class="subtab active" data-s="v1-frame">Spine + H.E.A.R.</button>
+        <button class="subtab" data-s="v1-phase">Phase by phase</button>
+        <button class="subtab" data-s="v1-dp">Decision points</button>
+      </div>
+
+      <div class="vpanel">
+        <div class="subview active" id="v1-frame">
+          <div class="card">
+            <h3>Two things run in parallel</h3>
+            <p>Every Sev 1 is two jobs at once: the <b>incident mechanics</b> — how we work the problem — and the <b>customer conversation</b> — how we hold the relationship. This sprint is about the second, but it only works pinned to the first.</p>
+            <h3 class="sp">The incident spine — the mechanics</h3>
+            <p>A Sev 1 isn't a straight line — it's a loop. Each stage feeds the next, and what you learn at the close feeds back into how you catch and run the next one.</p>
+            <div class="cycle">
+              <svg viewBox="0 0 500 510" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The incident cycle: Acknowledge, Act and declare, Customer comms while you work it, Mitigate resolve and close — looping back.">
+                <defs>
+                  <marker id="ah" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M1,1 L11,6 L1,11 z" fill="#b07dec"/>
+                  </marker>
+                  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="3.2" result="b"/>
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+
+                <!-- clockwise arcs, edge-to-edge between nodes -->
+                <g fill="none" stroke="#9e62dd" stroke-width="3" stroke-linecap="round" marker-end="url(#ah)" filter="url(#glow)">
+                  <path d="M 303.0,101.1 A 158,158 0 0 1 398.9,197.0"/>
+                  <path d="M 398.9,303.0 A 158,158 0 0 1 303.0,398.9"/>
+                  <path d="M 197.0,398.9 A 158,158 0 0 1 101.1,303.0"/>
+                  <path d="M 101.1,197.0 A 158,158 0 0 1 197.0,101.1"/>
+                </g>
+
+                <!-- centre label -->
+                <text x="250" y="244" text-anchor="middle" class="ring-cap">The incident</text>
+                <text x="250" y="266" text-anchor="middle" class="ring-cap2">cycle</text>
+
+                <!-- node 1: top -->
+                <g filter="url(#glow)">
+                  <circle cx="250" cy="92" r="42" fill="#1a1030" stroke="#9e62dd" stroke-width="2.8"/>
+                </g>
+                <text x="250" y="99" text-anchor="middle" class="seg-num">1</text>
+                <text x="250" y="38" text-anchor="middle" class="seg-label">Acknowledge</text>
+
+                <!-- node 2: right -->
+                <g filter="url(#glow)">
+                  <circle cx="408" cy="250" r="42" fill="#1a1030" stroke="#9e62dd" stroke-width="2.8"/>
+                </g>
+                <text x="408" y="257" text-anchor="middle" class="seg-num">2</text>
+                <text x="408" y="316" text-anchor="middle" class="seg-label">Act &amp; declare</text>
+
+                <!-- node 3: bottom -->
+                <g filter="url(#glow)">
+                  <circle cx="250" cy="408" r="42" fill="#1a1030" stroke="#9e62dd" stroke-width="2.8"/>
+                </g>
+                <text x="250" y="415" text-anchor="middle" class="seg-num">3</text>
+                <text x="250" y="474" text-anchor="middle" class="seg-label">Customer comms</text>
+                <text x="250" y="492" text-anchor="middle" class="seg-sub">while you work it</text>
+
+                <!-- node 4: left -->
+                <g filter="url(#glow)">
+                  <circle cx="92" cy="250" r="42" fill="#1a1030" stroke="#9e62dd" stroke-width="2.8"/>
+                </g>
+                <text x="92" y="257" text-anchor="middle" class="seg-num">4</text>
+                <text x="92" y="312" text-anchor="middle" class="seg-label">Mitigate,</text>
+                <text x="92" y="330" text-anchor="middle" class="seg-label">resolve, close</text>
+              </svg>
+            </div>
+            <h3 class="sp">The conversation framework — H.E.A.R.</h3>
+            <div class="callout tip"><span class="ico">📖</span><span><b>Where this comes from:</b> H.E.A.R. is our own four-step adaptation for live incidents, riffing on the established <b>HEARD</b> customer-service method (Hear · Empathize · Apologize · Resolve · Diagnose). We reshaped it for the Sev 1 case where there's no fix yet: holding and explaining matter more than apologizing, and the diagnosis is assumed.</span></div>
+            <div class="hear">
+              <div class="hstep"><div class="letter">H</div><div class="htext"><b>Hold.</b> <span>Signal ownership before you have a fix. Acknowledge quickly; commit to a specific next update.</span></div></div>
+              <div class="hstep"><div class="letter">E</div><div class="htext"><b>Explain.</b> <span>Update on a cadence, say what you've ruled out, and lead with "no data loss" <i>only once it's verified</i>.</span></div></div>
+              <div class="hstep"><div class="letter">A</div><div class="htext"><b>Acknowledge.</b> <span>Meet the emotion before the technical. Frame any customer-side cause as a shared question, not blame.</span></div></div>
+              <div class="hstep"><div class="letter">R</div><div class="htext"><b>Resolve.</b> <span>Name the cause plainly, admit a wrong first theory, add a preventive step, leave the door open.</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subview" id="v1-phase">
+          <div class="card">
+            <h3>What to prioritise, phase by phase</h3>
+            <p>The conversation moves through four phases. In each, the weight goes somewhere specific — and there's one mistake to avoid.</p>
+            <table>
+              <tr><th>Phase</th><th>Where the weight goes</th><th>Watch-out</th></tr>
+              <tr><td><b>First contact</b></td><td>Ownership + next-update time</td><td>No generic holding line</td></tr>
+              <tr><td><b>Holding pattern</b></td><td>Cadence + what's ruled out</td><td>Don't claim "no data loss" unverified</td></tr>
+              <tr><td><b>De-escalation</b></td><td>Impact first, then technical</td><td>Don't get defensive or blame</td></tr>
+              <tr><td><b>Resolution &amp; close</b></td><td>Cause + prevention + open door</td><td>Don't close transactionally</td></tr>
+            </table>
+
+            <div class="callout tip"><span class="ico">💡</span><span>The read that sets your tone: is the customer <b>furious</b> or <b>frightened</b>? A furious customer needs you to acknowledge impact first ("a gap in your pipeline isn't acceptable to us either") before any technical detail. A frightened customer needs certainty first ("your data is safe in the stream, nothing is lost") before root cause.</span></div>
+
+            <h3 class="sp">How your tone evolves as the incident matures</h3>
+            <p>The four phases above tell you <i>what to prioritise</i>. As the incident itself progresses — from just-declared through to resolved — they also tell you <i>how your tone should shift</i>. Same incident, different tone depending on where you are:</p>
+            <table>
+              <tr><th>Incident stage</th><th>Customer feels</th><th>Your tone</th><th>Lead with</th></tr>
+              <tr><td>Just declared, no cause</td><td>Panic or anger</td><td>Calm and owning</td><td>"I've got this, we're on it"</td></tr>
+              <tr><td>Investigating</td><td>Anxious</td><td>Transparent and steady</td><td>What you know, what you're ruling out</td></tr>
+              <tr><td>Contained</td><td>Cautiously hopeful</td><td>Confident and careful</td><td>"Impact is limited, here's why"</td></tr>
+              <tr><td>Recovering</td><td>Relieved, curious</td><td>Reassuring and factual</td><td>No data loss, backlog draining</td></tr>
+              <tr><td>Resolved</td><td>Wants assurance</td><td>Accountable, forward-looking</td><td>Root cause and prevention</td></tr>
+            </table>
+            <div class="callout tip"><span class="ico">💡</span><span>When you pull more people in or raise priority, say so plainly: "I'm escalating this internally to get more eyes on it faster." Customers read that as you taking them seriously. De-escalate only once reality supports it — too early reads as dismissive.</span></div>
+          </div>
+        </div>
+
+        <div class="subview" id="v1-dp">
+          <div class="card">
+            <div class="dp"><b>Verified before reassuring?</b> "No data loss" is the most reassuring thing you can say, and the most damaging if false. Verify first.</div>
+            <div class="dp"><b>Cause possibly customer-side?</b> Frame it as a shared diagnostic question, never an accusation.</div>
+            <div class="dp"><b>Time for a call?</b> When text is going in circles or the customer is highly anxious, offering a call signals confidence, not retreat.</div>
+            <div class="dp"><b>First theory wrong?</b> Say so. Admitting it builds more trust than quietly moving on.</div>
+            <div class="callout tip"><span class="ico">💡</span><span>Every strong reply commits to a next step, names something concrete, or owns our part. Weak replies are vague, defensive, or silent.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EXAMPLE LANGUAGE ===== -->
+  <section class="topview" id="v2">
+    <div class="vhead"><h1>💬 Example language — weak vs strong</h1></div>
+
+    <div class="vtabs">
+      <div class="subtabs" data-group="v2">
+        <button class="subtab active" data-s="v2-first">First contact</button>
+        <button class="subtab" data-s="v2-hold">Holding</button>
+        <button class="subtab" data-s="v2-deesc">De-escalation</button>
+        <button class="subtab" data-s="v2-close">Close</button>
+        <button class="subtab" data-s="v2-worked">Worked examples</button>
+      </div>
+
+      <div class="vpanel">
+        <p class="lead-line"><b>The weak line is the instinct under pressure.</b> The strong line is what holds the relationship.</p>
+
+        <div class="subview active" id="v2-first">
+      <div class="card"><div class="lang">
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">"We're looking into it and will get back to you."</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"We're on it and treating this as critical. Early signs point to a processing delay, not lost data. I'm confirming now and will update you within 30 minutes, even if it's only to say we're still digging."</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="subview" id="v2-hold">
+      <div class="card"><div class="lang">
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">"Still working on it."</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"We've ruled out [X] and are now focused on [Y]. Your events are safe and queued; nothing is being lost. Next update by [time]."</div></div>
+        </div>
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">[no message for two hours]</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"No change to report yet, but I haven't forgotten you — the team is still actively on it. Next check-in in 30 minutes."</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="subview" id="v2-deesc">
+      <div class="card"><div class="lang">
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">"There's no need to escalate, we're handling it."</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"I understand the impact, and you're right that a repeat isn't acceptable. Here's where we stand. To rule things out, did [X] change on your side?"</div></div>
+        </div>
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">"We follow industry best practice, so this shouldn't be happening."</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"That this has happened more than once is a fair thing to be frustrated about. Let me explain what's different this time and what we're putting in place so it stops."</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="subview" id="v2-close">
+      <div class="card"><div class="lang">
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">"Resolved. Closing this ticket."</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"You're back to normal, no data lost. Cause was [plain-language cause], and we've [preventive step] so it doesn't recur. Reopen the moment anything looks off."</div></div>
+        </div>
+        <div class="pair">
+          <div class="weak"><div class="lbl">Weak</div><div class="txt">"It's fixed now."</div></div>
+          <div class="strong"><div class="lbl">Strong</div><div class="txt">"Fixed — and to be straight, our first theory was wrong, which cost us an hour. The real cause was [X]. Here's what we changed so the diagnosis is faster next time."</div></div>
+        </div>
+      </div>
+      <div class="callout tip"><span class="ico">💡</span><span>Every phrase is peer-tested: one writes, the other reacts as the customer. If it sounds like an auto-reply spoken aloud, it goes.</span></div>
+      </div>
+    </div>
+    <div class="subview" id="v2-worked">
+      <div class="card">
+        <p style="margin-bottom:16px">Longer worked examples, adapted from real Sev 1 handling. Test any line on a peer before you use it live.</p>
+        <div class="worked"><b>First acknowledgement, with one observation</b><span>"Thanks for flagging this. From our side the collector looks healthy and is returning 200s, but I can see enrichment stopped processing at [time], so the drop is downstream of collection. I'm digging into that now and it has our full attention."</span></div>
+        <div class="worked"><b>Holding the line on a fix time, without a false promise</b><span>"I can't give you an honest fix time yet because we're still isolating the cause, and I don't want to give you a number I'm not sure of. What I can tell you is that this has our full attention as a Sev 1, the right people are on it, and I'll keep you posted as we learn more."</span></div>
+        <div class="worked"><b>Protecting a frightened customer</b><span>"Before anything else: your raw events are still being collected and held in the stream, so we're not looking at data loss. The delay is in processing, and once we clear it the backlog will drain and your data will land."</span></div>
+        <div class="worked"><b>Handover to another engineer, customer-facing</b><span>"A colleague is picking this up so we keep working it around the clock. They're fully briefed on everything so far, and we'll keep you posted the same way."</span></div>
+      </div>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MACRO / PLAYBOOK ===== -->
+  <section class="topview" id="v3">
+    <div class="vhead"><h1>⚙️ Macro / playbook entry</h1></div>
+
+    <div class="vtabs">
+      <div class="subtabs" data-group="v3">
+        <button class="subtab active" data-s="v3-m1">Macro 1 · Customer-reported</button>
+        <button class="subtab" data-s="v3-m2">Macro 2 · Proactive</button>
+        <button class="subtab" data-s="v3-kb">Playbook / KB article</button>
+      </div>
+
+      <div class="vpanel">
+        <p class="lead-line"><b>Macros for speed.</b> A playbook for depth.</p>
+
+        <div class="subview active" id="v3-m1">
+          <div class="card">
+            <div class="macro-name">Sev 1 :: Customer-reported acknowledgement</div>
+            <p class="macro-use">Use when the customer raised the issue and flagged it high or urgent. Fill the bracketed fields, keep it public.</p>
+<pre>Hi <span class="ph">[Customer name]</span>,
+
+Thanks for flagging this, and for the detail you've shared. We're already
+looking into it on our side. <span class="ph">[Optional, if you can confirm something: "I can
+see the collector is healthy and returning 200s, so we're focused on what's
+happening downstream."]</span>
+
+It has our full attention and the right people are on it. I'll keep you
+updated as we learn more, and let you know as soon as I have something
+concrete.
+
+Anything you can share that helps us pin down the cause is really useful:
+when you first noticed it, which pipelines or environments are affected, any
+errors on your side, and any recent changes. If it starts affecting
+something time-sensitive, tell me here too.
+
+Kind regards,
+<span class="ph">[Your name]</span>
+Support Engineer
+support.snowplow.io</pre>
+          </div>
+        </div>
+
+        <div class="subview" id="v3-m2">
+          <div class="card">
+            <div class="macro-name">Sev 1 :: Proactive notification</div>
+            <p class="macro-use">Use when we spotted the issue and are reaching out first. Fill the bracketed fields, keep it public.</p>
+<pre>Hi <span class="ph">[Customer name]</span>,
+
+I'm reaching out to let you know we've spotted an issue affecting
+<span class="ph">[pipeline / component]</span>, and we're already on it.
+
+<span class="ph">[What we've seen, in plain terms. For example: "We've received an alert
+flagging enrich latency on your prod1 pipeline, where data is taking longer
+than usual to land. I've attached the related error logs below so you can
+see the specific errors we're working from."]</span>
+
+We're treating this as urgent and the team is actively working to resolve
+it. <span class="ph">[If true and reassuring: "Your raw events are still being collected, so
+we're not expecting data loss. It's the processing that's delayed."]</span>
+
+There's nothing you need to do right now, but if you can share anything that
+helps us narrow it down (any recent changes on your side, other symptoms
+you're seeing, or environments affected), it will help us get to the cause
+faster. I'll keep you posted as we make progress, and let you know as soon
+as it's resolved.
+
+Kind regards,
+<span class="ph">[Your name]</span>
+Support Engineer
+support.snowplow.io</pre>
+            <div class="callout warn"><span class="ico">⚠️</span><span><b>Guardrail:</b> never paste internal diagnosis verbatim, never promise a fix time engineering hasn't confirmed, and lead with "no data loss" only when it's verified.</span></div>
+          </div>
+        </div>
+
+        <div class="subview" id="v3-kb">
+          <div class="card">
+            <h3>When to use this</h3>
+            <p>A Sev 1 is live, there's no resolution yet, and the customer is frightened or furious and pushing for a fix time. You usually know how to fix the pipeline. The harder skill is holding the relationship while you work the problem.</p>
+            <p>This playbook gives you the customer-facing flow, example language tested on real incidents, two Zendesk macros, and the All Hands demo. It runs alongside the Incident Response Process and Response Checklist, which cover how to run the incident itself.</p>
+
+            <h3 class="sp">The one fact that shapes everything</h3>
+            <p>We commit to a first response time, not a resolution time.</p>
+            <table>
+              <tr><th>Severity</th><th>Standard</th><th>Enhanced</th></tr>
+              <tr><td><b>1 (Urgent)</b></td><td>1 hour first response</td><td>0.5 hour first response</td></tr>
+            </table>
+            <p style="margin-top:12px">So you can promise attention, ownership, and care. You cannot promise a fix time you don't control. Every step below follows from that.</p>
+            <p>A Sev 1 (major incident) is anything that materially affects a customer's ability to get their data where they need it, when they need it. The internal rule is: if in doubt, raise it as an incident and sort out the technicalities later. Better to over-serve and downgrade than to under-serve.</p>
+
+            <h3 class="sp">The flow</h3>
+            <p>The same four steps we already work a Sev 1 by. The difference here is the customer conversation that runs in parallel.</p>
+            <div class="callout fact"><span class="ico">🔁</span><span><b>Acknowledge → Act and declare → Customer comms while you work it → Mitigate, resolve, close the loop</b></span></div>
+
+            <h4 class="kb-step">1. Acknowledge</h4>
+            <p>Reply inside the SLA window. This does not need a diagnosis. Confirm a human owns it, name what you've understood, and show you're on it. Silence is what makes a frightened customer panic, so the acknowledgement matters more than its content.</p>
+            <p>If you've already confirmed one thing, share it ("collector is healthy, the drop is downstream"). If not, acknowledge anyway. Don't wait for certainty to make first contact.</p>
+
+            <h4 class="kb-step">2. Act and declare</h4>
+            <p>Declare the incident (<code>/incident</code> in <code>#incidents</code>), open or escalate the Jira card with the correct Priority, and pull in SRE if needed. Do this in parallel with the customer conversation, not after it. Only tickets explicitly escalated through the Jira workflow trigger the urgent SRE alerts, so set Priority correctly or no one is paged.</p>
+            <p>Declaring early is a customer-facing skill, not just an ops one. The Cargurus incident shows the cost: a 1 hour 7 minute gap between the alert firing (16:48 UTC) and escalation (17:55 UTC), because an Iglu-down alert was treated as "High" rather than an immediate Sev 1. Every minute of internal delay is a minute the customer sits in the dark.</p>
+            <p>Off-hours, or if SRE is unresponsive, escalate to a Support Leader by Slack then phone (numbers are on Slack profiles). They coordinate with engineering for you. Don't sit waiting.</p>
+
+            <h4 class="kb-step">3. Customer comms while you work it</h4>
+            <p>This is the part the sprint is really about, and it has two jobs: keep the customer feeling looked-after, and shift your tone correctly as the incident moves.</p>
+            <p><b>Keep them updated without over-promising.</b> Tell the customer they'll hear from you as things develop, and then actually keep checking in, even when there's no news. "We're still on it, no change yet" is reassuring. Avoid committing to a fix time or a resolution date. If the customer relies on real-time data (personalization, fraud, live decisioning), check in more often and pull in the TAM and CSM. Draft updates at the bottom of the incident Slack Canvas so the message stays consistent across a handover.</p>
+            <p><b>Shift the register as the incident matures.</b> This is the escalation and de-escalation register. Same incident, different tone depending on where you are:</p>
+            <table>
+              <tr><th>Phase</th><th>Customer feels</th><th>Your register</th><th>Lead with</th></tr>
+              <tr><td>Just declared, no cause</td><td>Panic or anger</td><td>Calm and owning</td><td>"I've got this, we're on it"</td></tr>
+              <tr><td>Investigating</td><td>Anxious</td><td>Transparent and steady</td><td>What you know, what you're ruling out</td></tr>
+              <tr><td>Contained</td><td>Cautiously hopeful</td><td>Confident and careful</td><td>"Impact is limited, here's why"</td></tr>
+              <tr><td>Recovering</td><td>Relieved, curious</td><td>Reassuring and factual</td><td>No data loss, backlog draining</td></tr>
+              <tr><td>Resolved</td><td>Wants assurance</td><td>Accountable and forward-looking</td><td>Root cause and prevention</td></tr>
+            </table>
+            <p style="margin-top:12px">When you pull more people in or raise priority, say so plainly: "I'm escalating this internally to get more eyes on it faster." Customers read that as you taking them seriously. De-escalate (slow down, hand back control) only once reality supports it. Too early reads as dismissive.</p>
+            <p>One read to make early: is the customer furious or frightened? A furious customer needs you to acknowledge the impact first ("a gap in your pipeline isn't acceptable to us either") before any technical detail. A frightened customer needs certainty first ("your data is safe in the stream, nothing is lost") before root cause.</p>
+
+            <h4 class="kb-step">4. Mitigate, resolve, and close the loop</h4>
+            <p>When the IC declares resolution, confirm recovery in plain language and set expectations for the PIR. The postmortem is internal. If the customer wants a written account, produce a separate Customer Incident Summary, never the internal PM. If they ask how you'll prevent or detect this next time, treat it as a trust opportunity and answer concretely (alerting changes, escalation paths, comms preferences).</p>
+
+            <h3 class="sp">Example language</h3>
+            <p class="macro-use">Adapted from real Sev 1 handling (Angi/Wave enrich outage ZD#45966, Betway Azure Lake Loader ZD#49191). Test any line on a peer before you use it live.</p>
+            <div class="worked"><b>First acknowledgement, with one observation</b><span>"Thanks for flagging this. From our side the collector looks healthy and is returning 200s, but I can see enrichment stopped processing at [time], so the drop is downstream of collection. I'm digging into that now and it has our full attention."</span></div>
+            <div class="worked"><b>Holding the line on a fix time, without a false promise</b><span>"I can't give you an honest fix time yet because we're still isolating the cause, and I don't want to give you a number I'm not sure of. What I can tell you is that this has our full attention as a Sev 1, the right people are on it, and I'll keep you posted as we learn more."</span></div>
+            <div class="worked"><b>Protecting a frightened customer</b><span>"Before anything else: your raw events are still being collected and held in the stream, so we're not looking at data loss. The delay is in processing, and once we clear it the backlog will drain and your data will land."</span></div>
+            <div class="worked"><b>Update with no progress</b><span>"Quick update as promised. We're still working this, our team is on it, and we've ruled out [X]. No change to report yet, but it stays our top priority and I'll come back as soon as there's more."</span></div>
+            <div class="worked"><b>De-escalation, acknowledge impact first (from a live incident)</b><span>"We'll run a full Post Incident Review and follow up with our findings, the root cause, and the actions we're taking to prevent this from happening again. In the meantime, did this affect anything downstream, for example anything relying on real-time data? And thank you for raising it. That let us trigger an incident and get all hands on it as fast as possible."</span></div>
+            <div class="worked"><b>Resolution</b><span>"We've restarted the affected component and events are flowing again. Latency is dropping and metrics look stable, and we'll keep monitoring. Because we kept your raw data in the stream throughout, the backlog is draining and your data will land. I'll follow up after our PIR with the root cause and prevention steps."</span></div>
+            <div class="worked"><b>Handover to another engineer, customer-facing</b><span>"A colleague is picking this up so we keep working it around the clock. They're fully briefed on everything so far, and we'll keep you posted the same way."</span></div>
+
+            <h3 class="sp">KB summary (one paragraph for the team KB)</h3>
+            <p>Work a Sev 1 the way we always do, and run the customer conversation in parallel. Acknowledge fast, inside the SLA window and before you have a diagnosis. Act and declare: declare the incident, escalate with the correct Jira Priority, pull in SRE. While you work it, keep the customer updated without promising a fix time, and shift your tone from reactive to reassuring as the incident matures, leading with impact for a furious customer and with data safety for a frightened one. Then mitigate, resolve, and close the loop with a plain-language recovery confirmation and a separate Customer Incident Summary, never the internal PM. We commit to a first response (1hr Standard, 30min Enhanced), never a resolution time, so promise attention and care, not a fix clock.</p>
+
+            <h3 class="sp">Sources</h3>
+            <ul class="bul">
+              <li>June Sprint brief</li>
+              <li>Incident Response Process · Response Checklist</li>
+              <li>What is an incident? · Prioritization matrix</li>
+              <li>Cargurus Iglu Down postmortem</li>
+              <li>Snowplow Service Levels (SLA)</li>
+              <li>Zendesk #45966 (Angi/Wave enrich outage), #49191 (Betway Azure Lake Loader)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIVE DEMO ===== -->
+  <section class="topview" id="v4">
+    <div class="vhead"><h1>🎤 Live demo + interactive practice</h1></div>
+
+    <div class="vtabs">
+      <div class="subtabs" data-group="v4">
+        <button class="subtab active" data-s="v4-practice">Interactive practice</button>
+        <button class="subtab" data-s="v4-beats">Beats &amp; takeaway</button>
+      </div>
+
+      <div class="vpanel">
+        <div class="subview active" id="v4-practice">
+          <p class="lead-line"><b>Work a live Sev 1.</b> Pick how you'd reply at each phase, and watch the customer react.</p>
+          <div class="card">
+            <p style="margin:0">A real scenario plays out one phase at a time. At each step, choose how you'd reply. The customer reacts to your choice, the mood meter moves, and you'll see why it landed the way it did. This is the interactive version of the demo, no live role-play required.</p>
+          </div>
+          <div id="practice-stage"></div>
+        </div>
+
+        <div class="subview" id="v4-beats">
+          <div class="card">
+            <ul class="bul">
+              <li><b>Acknowledge</b> in under a minute, name the one thing we can see, show it has our full attention. No diagnosis yet.</li>
+              <li><b>Act and declare</b> — narrate declaring the incident and escalating to SRE in parallel, so the customer conversation never pauses for the internal one.</li>
+              <li><b>Customer comms</b> — reassure and protect ("raw events are still in the stream, no data loss"), then the hard moment where the customer demands a fix time and the engineer holds the line with care and no false promise.</li>
+              <li><b>Mitigate, resolve, close</b> — plain-language recovery, the PIR commitment, and the offer of a Customer Incident Summary.</li>
+            </ul>
+            <div class="takeaway"><b>Takeaway for the team:</b> In a Sev 1 you can't promise a fix time, so promise what you can keep — a human owns it, here's what I can see, and we'll stay with you until it's resolved. Silence is the only real failure.</div>
+            <div class="callout tip"><span class="ico">💡</span><span><b>Prep:</b> run through once together before the All Hands. Keep it practical — the room should leave with phrases they could use on the next Sev 1, plus a tool they can practise in.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== METHOD BEHIND IT ===== -->
+  <section class="topview" id="v5">
+    <div class="vhead"><h1>🔍 How we built this</h1></div>
+
+    <div class="vtabs">
+      <div class="subtabs" data-group="v5">
+        <button class="subtab active" data-s="v5-research">Ticket research</button>
+        <button class="subtab" data-s="v5-patterns">Patterns found</button>
+        <button class="subtab" data-s="v5-coord">Coordination</button>
+      </div>
+
+      <div class="vpanel">
+        <p class="lead-line"><b>The work behind the deliverable.</b> Real ticket research, the phase work, and how the pair coordinated.</p>
+
+        <div class="subview active" id="v5-research">
+          <div class="card">
+            <p>We worked from three years of escalation and urgent tickets, narrowed to genuine customer-frustration arcs — live incidents where the customer was anxious or angry and the relationship was at stake while the work was unresolved. Coverage runs across every major category: data not landing, loader/warehouse, volume drop/spike, security/CVE, access/SSO, certificate/domain, data quality.</p>
+            <p>Each thread was read end to end and tagged against four questions: what the customer actually needed to hear vs. the literal question they asked; whether a next-update time was given and kept; how the reactive-to-reassuring pivot went; and whether the close landed honestly or transactionally.</p>
+            <div class="callout warn"><span class="ico">⚠️</span><span>Findings are generalised. Real names, figures, and internal notes are stripped before any reuse.</span></div>
+          </div>
+        </div>
+
+        <div class="subview" id="v5-patterns">
+          <div class="card">
+            <p style="margin-bottom:14px">The threads that turned tense shared a recognisable shape — the signals a conversation is slipping:</p>
+            <div class="pattern"><b>The repeated follow-up.</b> <span>The customer chases two or three times before a substantive reply; by the third message the tone hardens.</span></div>
+            <div class="pattern"><b>"This is business-critical."</b> <span>Stated explicitly because they don't feel it's registered. Having to say it twice escalates frustration fast.</span></div>
+            <div class="pattern"><b>The silence gap.</b> <span>A stretch with no update during active work. The customer fills the silence with worst-case assumptions.</span></div>
+            <div class="pattern"><b>The data-loss fear.</b> <span>The unspoken question under most incidents: "is our data gone?" Addressed early, the thread calms down.</span></div>
+            <div class="pattern"><b>Looping in leadership.</b> <span>The customer CCs their manager or ours — the clearest signal the relationship, not just the ticket, is at risk.</span></div>
+            <div class="pattern"><b>"This keeps happening."</b> <span>A recurring issue carries the weight of every prior occurrence. A fix-only reply reads as dismissive.</span></div>
+            <div class="pattern"><b>The unanswered "why."</b> <span>When a preventable cause surfaces, skipping the why turns relief into renewed frustration.</span></div>
+            <div class="callout tip"><span class="ico">💡</span><span>The common thread: discomfort spikes when the customer feels <b>unheard, uninformed, or unsure their data is safe</b> — more than from the incident itself.</span></div>
+            <h3 class="sp">Anti-patterns that fracture the relationship</h3>
+            <div class="anti-item"><b>The non-answer.</b> <span>"Looking into it," no owner, no timeline. Reads like an auto-reply.</span></div>
+            <div class="anti-item"><b>Premature blame.</b> <span>Questioning the customer's setup before diagnosing. Burns trust in the first reply.</span></div>
+            <div class="anti-item"><b>The silence.</b> <span>Going quiet mid-incident. No update is itself an update, and it says "we forgot you."</span></div>
+            <div class="anti-item"><b>The defensive pivot.</b> <span>Meeting frustration with "we follow best practice" instead of acknowledging impact.</span></div>
+            <div class="anti-item"><b>The transactional close.</b> <span>Marked resolved, no cause named, no door left open.</span></div>
+          </div>
+        </div>
+
+        <div class="subview" id="v5-coord">
+          <div class="card">
+            <h3>Coordination notes</h3>
+            <p><b>Async-first.</b> The EMEA/AMER timezone gap is a feature — one drafts, the other reacts with fresh eyes. One sync call per week max, for peer-testing phrases aloud rather than status updates.</p>
+            <p><b>Cross-pair awareness.</b></p>
+            <ul class="bul">
+              <li><b>Pair 5 (timelines / SLA)</b> — directly overlaps; align on Urgent/SLA-bound language so the team hears one voice.</li>
+              <li><b>Pair 3 (relationship-building)</b> — their warmth framing feeds our Acknowledge step.</li>
+              <li><b>Pair 2 (scope disagreement)</b> — de-escalation matters when a scope "no" lands on an already-frustrated customer.</li>
+              <li><b>Pair 6 (delivering bad news)</b> — keep the honesty register consistent with our close.</li>
+            </ul>
+            <div class="callout tip"><span class="ico">🧠</span><span><b>TRAICE capture (for Edwin):</b> the reusable judgement call is <i>acknowledge before certainty, lead with care and urgency, and never trade a fix-time promise for short-term reassurance.</i></span></div>
+            <div class="callout tip"><span class="ico">📍</span><span><b>AMER visibility (Leonardo):</b> this page is the single source of truth for our status — blockers surfaced early, not at month end.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <img class="foot-logo" alt="Snowplow" src="data:image/png;base64,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">
+    <span class="foot-mid">Company Confidential</span>
+    <a class="foot-right" href="https://www.snowplow.io">www.snowplow.io</a>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var top=document.getElementById('toptabs');
+    var topbtns=top.querySelectorAll('.toptab');
+    var topviews=document.querySelectorAll('.topview');
+    top.addEventListener('click',function(e){
+      var b=e.target.closest('.toptab'); if(!b)return;
+      var v=b.dataset.v;
+      topbtns.forEach(function(x){x.classList.toggle('active',x===b);});
+      topviews.forEach(function(p){p.classList.toggle('active',p.id===v);});
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    document.querySelectorAll('.subtabs').forEach(function(bar){
+      bar.addEventListener('click',function(e){
+        var b=e.target.closest('.subtab'); if(!b)return;
+        var s=b.dataset.s;
+        bar.querySelectorAll('.subtab').forEach(function(x){x.classList.toggle('active',x===b);});
+        var parent=bar.closest('.topview');
+        parent.querySelectorAll('.subview').forEach(function(p){p.classList.toggle('active',p.id===s);});
+      });
+    });
+  })();
+
+  // ===== Interactive practice role-play (Live demo tab) — multi-scenario =====
+const PRACTICE_SCENARIOS = [
+{
+    id: "data-not-landing",
+    category: "Data not landing",
+    variants: [
+      {
+        title: "No data since yesterday",
+        meta: "Data not landing · urgent · shared channel watching",
+        opener: "Hi — we've had no Snowplow data land since yesterday afternoon. This is business-critical for us and the team is watching. Please treat this as urgent.",
+        steps: [
+          { phase:"First contact", scene:"It's your first reply. You've glanced at the dashboards but haven't confirmed a root cause yet. The customer is anxious and a shared channel is watching.", prompt:"How do you open?",
+            choices:[
+              { good:true, text:"We're on it and treating this as critical. Early signs point to a processing backlog rather than lost data — I'm confirming now and will update you within 30 minutes, even if only to say we're still digging.", react:"Okay — thank you, that's reassuring. We'll watch for your update.", mood:+2, tag:"Strong", fb:"You committed to a specific next-update time and pre-empted their deepest fear (lost data) without over-claiming. That converts panic into patience." },
+              { good:false, text:"We've received your ticket and will investigate. Someone will get back to you.", react:"\"Someone\"? When? This is critical for us — we need to know you're actually on it.", mood:-2, tag:"Weak", fb:"Generic and passive. No owner, no timeline, no acknowledgement of the stakes — it reads as a queue auto-reply and leaves them to chase you." },
+              { good:false, text:"Are you sure the problem isn't on your end? Have you checked your own pipeline configuration first?", react:"We didn't change anything. It worked yesterday. Please just look into it.", mood:-3, tag:"Weak", fb:"Leading with blame, before you've even diagnosed, puts the customer on the defensive and torches trust in the first reply." }
+            ]},
+          { phase:"Holding pattern", scene:"25 minutes later. You've ruled out the loader and confirmed events are queuing — not lost — but the root cause (an undersized warehouse cluster) isn't fixed yet.", prompt:"Your update is due. What do you send?",
+            choices:[
+              { good:true, text:"Update: this is not a data-loss situation — your events are queued and will load once we clear the backlog. We've ruled out the loader and traced it to warehouse capacity. Next update by [time].", react:"Good to hear nothing's lost. We'll hold for the next update.", mood:+2, tag:"Strong", fb:"Led with the single most reassuring true fact, showed progress via what you ruled out, and held the cadence. Textbook holding pattern." },
+              { good:false, text:"Still working on it. No update yet, will let you know.", react:"It's been nearly half an hour. Are you actually making progress?", mood:-2, tag:"Weak", fb:"A 'nothing yet' with no substance reads as no movement. Even with no fix, naming what you've ruled out is progress — silence erodes trust." },
+              { good:false, text:"We think it might be your warehouse, or possibly the loader, or maybe an enrichment issue — we're not sure yet.", react:"So you don't know what's wrong at all? That's not filling me with confidence.", mood:-2, tag:"Weak", fb:"Listing every possibility without a lead amplifies alarm. Share what you've ruled out and your current focus, not raw uncertainty." }
+            ]},
+          { phase:"De-escalation", scene:"The customer has come back sharper: \"This keeps happening. Every few weeks we lose visibility and your team scrambles. Why should we trust this won't recur?\"", prompt:"They're questioning your competence and it's partly a fair point. How do you respond?",
+            choices:[
+              { good:true, text:"I understand the frustration, and you're right that a repeat isn't acceptable. Honestly: the pattern points to your cluster being under-sized for current volume. I'm not going to treat this as a one-off — I'll put a sizing recommendation in writing so we fix the cause, not just the symptom.", react:"That's the first time someone's actually named why it keeps happening. Appreciated — send the recommendation.", mood:+3, tag:"Strong", fb:"You validated the frustration, met the competence doubt head-on with an honest diagnosis, and reframed a recurring problem as something you'll fix at the root." },
+              { good:false, text:"We're experts in this and we follow best practices. These things happen with data pipelines sometimes.", react:"That's a non-answer. 'These things happen' isn't good enough when it's our business.", mood:-3, tag:"Weak", fb:"Defensive and dismissive. Asserting expertise while waving off a real pattern confirms exactly the doubt they raised." },
+              { good:false, text:"As per our previous tickets, this is a known issue and we've explained it before.", react:"So you've known about it and it still keeps happening? That's worse.", mood:-3, tag:"Weak", fb:"'As per previous' is blame-shifting, and pointing to a known-but-unfixed issue makes it worse. Own the experience before re-engaging." }
+            ]},
+          { phase:"Resolution & close", scene:"The backlog has drained, latency is back to normal, and you've drafted a sizing recommendation. Time to close.", prompt:"How do you wrap up?",
+            choices:[
+              { good:true, text:"You're back to normal — backlog cleared, no data lost. Root cause was warehouse capacity under peak load; the sizing recommendation is attached so this stops recurring. I'll keep monitoring, and please reopen or raise an urgent ticket the moment anything looks off — we'd rather hear early.", react:"Thanks — this is the most useful resolution we've had on this. We'll review the sizing note.", mood:+2, tag:"Strong", fb:"Confirmed the reassuring outcome, named the cause plainly, delivered the preventive fix, and left the door open. A clean, trust-building close." },
+              { good:false, text:"Resolved. Closing the ticket now. Open a new one if it happens again.", react:"Closing it already? You haven't told us why it happened or how to stop it.", mood:-2, tag:"Weak", fb:"Transactional. Closing without the cause or a preventive step guarantees the same ticket next month — and signals you just want it off your queue." }
+            ]}
+        ]
+      },
+      {
+        title: "Dashboards empty this morning",
+        meta: "Data not landing · urgent · board report due",
+        opener: "Our dashboards are completely empty this morning — no events at all since around midnight. I have a board report due at noon that depends on this data. I need to know what's happening, fast.",
+        steps: [
+          { phase:"First contact", scene:"First reply. The customer has a hard deadline in a few hours. You can see ingestion stopped overnight but haven't confirmed why.", prompt:"How do you open?",
+            choices:[
+              { good:true, text:"Understood — with a noon deadline I'm prioritising this right now. I can see ingestion stopped overnight and I'm tracing the cause; my first read is a stalled load, not lost data. I'll come back to you in 20 minutes with a clearer picture and a realistic timeline for your report.", react:"Thank you — 20 minutes works. Knowing it might not be lost data already helps.", mood:+2, tag:"Strong", fb:"You acknowledged the deadline, gave an honest early read without over-promising, and set a tight, specific update time. That steadies someone under their own clock." },
+              { good:false, text:"Thanks for reaching out. We'll add this to the queue and investigate in turn.", react:"The queue? I have a board report at noon. This can't wait in a queue.", mood:-3, tag:"Weak", fb:"'In turn' ignores the stated deadline entirely. When a customer hands you a hard time constraint, the one thing you can't do is treat it as routine." },
+              { good:false, text:"Have you refreshed the dashboard and cleared your cache? Sometimes it's just a display lag.", react:"It's not a display glitch — there's genuinely no data. Please take this seriously.", mood:-2, tag:"Weak", fb:"Reaching for trivial fixes signals you haven't grasped the severity. It reads as brushing them off rather than engaging with a real outage." }
+            ]},
+          { phase:"Holding pattern", scene:"15 minutes later. You've confirmed a stalled load job is the cause and events are safely queued — but the reprocess will take a couple of hours, likely past noon.", prompt:"Their deadline is tight. What do you send?",
+            choices:[
+              { good:true, text:"Good news first: no data is lost — everything's queued and will load. The honest part: the reprocess will take around two hours, which may run just past noon. If it helps your board report, I can pull the raw figures for [key metric] manually before then. Let me know and I'll start.", react:"Yes please — the manual figures would save me. Thank you for being straight about the timing.", mood:+3, tag:"Strong", fb:"You led with reassurance, were honest about a timeline that misses their deadline rather than hiding it, and offered a concrete workaround. Honesty plus a fallback builds real trust." },
+              { good:false, text:"It'll be fixed soon, should be fine for your report.", react:"'Soon' and 'should be' — can you actually commit to before noon or not?", mood:-2, tag:"Weak", fb:"Vague reassurance against a hard deadline sets up a broken promise. If you can't make their time, say so early and offer an alternative — don't paper over it." },
+              { good:false, text:"We're reprocessing. It'll be done when it's done — these things can't be rushed.", react:"That's not helpful when I have people waiting on this report.", mood:-2, tag:"Weak", fb:"Technically true but cold. 'Done when it's done' abandons them to their deadline with no path forward — no estimate, no workaround, no ownership." }
+            ]},
+          { phase:"De-escalation", scene:"The customer is stressed: \"This is the worst possible timing. How am I supposed to rely on a platform that just stops overnight with no warning?\"", prompt:"They're venting real frustration about reliability. How do you respond?",
+            choices:[
+              { good:true, text:"That's completely fair — an overnight stop with no warning is exactly what shouldn't happen to data you're presenting to your board. The trigger was a load job that stalled silently; I'm going to raise adding an alert so we catch this and tell you proactively, rather than you finding empty dashboards. For now, let's get your report sorted.", react:"Thank you. The proactive alert is the kind of thing that would actually keep me confident.", mood:+3, tag:"Strong", fb:"You validated the frustration specifically, owned the real gap (no proactive alert), committed to a preventive fix, and redirected to their immediate need. That's the full de-escalation move." },
+              { good:false, text:"All platforms have occasional issues. This is rare and we resolved it quickly.", react:"It's not rare to me — it's happening right now, on my deadline.", mood:-3, tag:"Weak", fb:"Minimising with 'all platforms have issues' dismisses a frustrated customer's lived experience and sounds like you're defending yourself, not helping them." },
+              { good:false, text:"I understand, but there was no way to predict a load job stalling like this.", react:"Then maybe you need monitoring that does predict it.", mood:-2, tag:"Weak", fb:"'No way to predict' is both likely untrue (it's monitorable) and defensive. It closes the door on the improvement the customer is implicitly asking for." }
+            ]},
+          { phase:"Resolution & close", scene:"You supplied the manual figures in time, the reprocess finished early afternoon, and dashboards are whole. You've logged a request for stall alerting.", prompt:"How do you close?",
+            choices:[
+              { good:true, text:"You're fully restored — the reprocess completed and your dashboards are whole, nothing lost. Glad the manual figures got you through the board report. Cause was a silently stalled load job; I've logged a request for alerting so we catch this proactively next time. Shout if anything in the data looks off after the catch-up.", react:"You turned a bad morning around — genuinely appreciated. Thank you.", mood:+2, tag:"Strong", fb:"Confirmed full recovery, acknowledged the deadline you helped them hit, named the cause, and locked in prevention. Closes both the incident and the relationship gap." },
+              { good:false, text:"Everything's loaded now. Closing this out — glad it's sorted.", react:"Thanks, though I'd like to know it won't silently stop again.", mood:-1, tag:"Weak", fb:"Recovery isn't the same as resolved-for-good. Without the preventive commitment, the customer is left bracing for the next silent overnight stop." }
+            ]}
+        ]
+      },
+      {
+        title: "Events stopped after our deploy",
+        meta: "Data not landing · high · customer suspects themselves",
+        opener: "We pushed a release last night and now we're seeing almost no events coming through. We think it might be us but we can't figure out what changed. Can you help us work out what's going on?",
+        steps: [
+          { phase:"First contact", scene:"First reply. Unusually, the customer is already owning the possibility it's their change — collaborative, not adversarial. You haven't confirmed the cause yet.", prompt:"How do you open?",
+            choices:[
+              { good:true, text:"Thanks for the context, and for flagging the release — that's a really useful starting point. I'll dig in from our side now and compare against your deploy time. Could you share roughly when the release went out and what it touched? I'll have an initial read for you within the half hour.", react:"Released about 11pm, mostly tracking code changes. Thanks for jumping on it.", mood:+2, tag:"Strong", fb:"You met their collaborative tone, used the lead they gave you, and asked a focused diagnostic question — without either blaming them or rushing to absolve them. Partnership mode." },
+              { good:false, text:"If you deployed last night, then yes, it's almost certainly your change. You'll need to roll it back.", react:"We came to you for help diagnosing it, not to be told to just roll back blind.", mood:-2, tag:"Weak", fb:"Even when the customer suspects themselves, jumping to 'it's you, roll back' before investigating is unhelpful — they wanted a diagnosis, not a guess." },
+              { good:false, text:"We'll take a look when we can. Deploy issues are usually self-inflicted though.", react:"That's a bit dismissive given we're asking for help here.", mood:-3, tag:"Weak", fb:"'Self-inflicted' is needlessly barbed, and 'when we can' drops the urgency. It punishes a customer for being upfront — exactly the wrong signal." }
+            ]},
+          { phase:"Holding pattern", scene:"20 minutes later. You've found it: their release changed a schema, so those events are now failing validation and landing in failed events rather than the atomic table. The fix is to align the tracking or the schema going forward; already-failed events can be patched separately.", prompt:"What do you send?",
+            choices:[
+              { good:true, text:"Found it — and importantly, your good data isn't corrupted. Your release changed the structure of an event, so those are now failing validation and being kept separate from your atomic table rather than polluting it. The fix going forward is to align either the tracking or the schema — I'll lay out both options. For the events that already failed, we can look at patching them separately so we don't lose that window.", react:"That makes sense — and good that the main table's protected. Show us the options.", mood:+3, tag:"Strong", fb:"Accurate to how Snowplow handles this: schema mismatches become failed events kept out of the atomic table. You reassured on data integrity, framed the forward fix as their choice, and were honest that already-failed events need separate handling rather than promising automatic recovery." },
+              { good:false, text:"Yeah, it's your schema change. The events are failing validation. You'll need to fix your tracking.", react:"Okay — but are those events gone? And which event exactly?", mood:-1, tag:"Weak", fb:"Correct diagnosis delivered bluntly, and it skips their real worry — is the data lost? — while offering only one narrow fix. Accurate but unhelpful." },
+              { good:false, text:"Confirmed it's the deploy. Told you it was probably your side.", react:"There's no need to make a point of it. Can we just fix it?", mood:-2, tag:"Weak", fb:"'Told you so' scores a point and damages the partnership — even when you were right. The customer's goodwill from owning it upfront just evaporated." }
+            ]},
+          { phase:"De-escalation", scene:"The customer is a bit embarrassed and frustrated at themselves: \"I can't believe a schema change broke this silently. We had no idea anything was wrong until events dried up.\"", prompt:"They're deflated, not angry at you. How do you respond?",
+            choices:[
+              { good:true, text:"Honestly, this catches a lot of teams out — a schema change failing silently is hard to spot without the right visibility. The good news is the system did its job: it quarantined the bad events instead of corrupting your data. Let me show you the failed-events view so you can catch this kind of thing within minutes next time, not hours.", react:"That would genuinely help — and it's reassuring it's a common trap, not just us.", mood:+3, tag:"Strong", fb:"You normalised their mistake without being patronising, reframed the 'failure' as the safeguard working, and gave them lasting visibility. Turns embarrassment into capability." },
+              { good:false, text:"Yeah, schema changes are risky. You really should test those before deploying.", react:"I'm aware, thanks. I didn't need the lecture right now.", mood:-3, tag:"Weak", fb:"Lecturing a customer who's already kicking themselves is salt in the wound. They needed support and a path forward, not a lesson on what they did wrong." },
+              { good:false, text:"It happens. Anyway, once you fix the tracking it'll be fine.", react:"Sure — I just wish we'd known sooner it was breaking.", mood:-1, tag:"Weak", fb:"Brushing past their concern misses the chance to give them the monitoring they're really asking for. 'It happens' leaves them no more equipped than before." }
+            ]},
+          { phase:"Resolution & close", scene:"They updated the tracking, the failed events were recovered, and volume is back to normal. You've walked them through the failed-events view.", prompt:"How do you close?",
+            choices:[
+              { good:true, text:"All sorted — tracking's aligned, the failed events have been recovered, and your volume is back to normal with nothing lost. You've now got the failed-events view bookmarked, so a future schema mismatch will show up there within minutes. A quick check of that after each release is the best guard. Always here if anything looks off.", react:"Brilliant — thank you for turning this into something we can self-monitor. Really helpful.", mood:+2, tag:"Strong", fb:"Confirmed full recovery, reinforced the new capability you gave them, and offered a simple preventive habit. Leaves them more self-sufficient than before the incident." },
+              { good:false, text:"Recovered and back to normal. Closing this one out.", react:"Thanks — I'll try to remember to check that view next time.", mood:0, tag:"Weak", fb:"Functional but flat. No reinforcement of the monitoring habit means the hard-won lesson is likely to fade before the next release." }
+            ]}
+        ]
+      }
+    ]
+  },
+  {
+    id: "security-cve",
+    category: "Security / CVE",
+    variants: [
+      {title: "Critical security vulnerability flagged",
+    meta: "Security / CVE · urgent · customer security team escalating",
+    opener: "Our security team has flagged a critical vulnerability in the infrastructure you manage for us. This is a clear breach of our security policy. We need this fixed immediately — please confirm you're treating it with the seriousness it deserves.",
+    steps: [
+      { phase:"First contact", scene:"A security stakeholder is escalating hard, with compliance weight behind it. You haven't yet confirmed whether it's exploitable or a false positive.", prompt:"How do you open?",
+        choices:[
+          { good:true, text:"Thank you for flagging this, and I appreciate your security team's diligence — we take these seriously. I'm engaging our team now and will come back within the hour with what's confirmed, what may be a false positive, and the mitigating controls already in place.", react:"Good. We'll expect that within the hour. Please loop in our security lead directly.", mood:+2, tag:"Strong", fb:"You matched the compliance register, took it seriously rather than minimising, and committed to a concrete update. Security escalations are about the stakeholder as much as the fix." },
+          { good:false, text:"This is probably a false positive from your scanner. These tools over-report all the time.", react:"You haven't even looked yet. Don't dismiss our security team's findings.", mood:-3, tag:"Weak", fb:"Dismissing a security finding before investigating insults the stakeholder and risks being wrong on something with compliance stakes. Never minimise upfront." },
+          { good:false, text:"We follow industry-standard security practices, so this should be fine.", react:"'Should be fine' is not an answer to a critical vulnerability.", mood:-2, tag:"Weak", fb:"A vague reassurance with no investigation and no commitment. It reads as deflection to a security team that needs specifics." }
+        ]},
+      { phase:"Holding pattern", scene:"You've confirmed the vulnerability is real but not yet exploited, and a patch is being prepared. The fix needs a maintenance window.", prompt:"Your update is due. What do you send?",
+        choices:[
+          { good:true, text:"Update: we've confirmed the vulnerability is present but we see no evidence of exploitation, and access is restricted by [existing control]. The patch is prepared and we're scheduling the window now — I'll confirm timing within [time].", react:"Understood. The mitigating control helps. Send the window timing as soon as you have it.", mood:+2, tag:"Strong", fb:"Confirmed the real status honestly, reduced alarm with a genuine mitigating control, and gave a clear next step. Calm, specific, credible." },
+          { good:false, text:"Still patching. I'll let you know when it's done.", react:"This is a critical security item. We need more than 'still patching.'", mood:-2, tag:"Weak", fb:"For a security escalation especially, a bare status with no detail on exposure or controls leaves the stakeholder exposed to their own internal questions." }
+        ]},
+      { phase:"De-escalation", scene:"The customer's security lead replies: \"This is the second policy breach this quarter. I'm escalating to our CISO. How do we know your environment is actually secure?\"", prompt:"The stakes and the scrutiny just went up. How do you respond?",
+        choices:[
+          { good:true, text:"That's a fair challenge, and I'd want the same assurance in your position. Here's what we've done since the last item: [concrete controls]. I'll prepare a short summary of our remediation and controls you can take to your CISO directly — I want you covered in that conversation, not caught out.", react:"That's exactly what I need for the CISO. Thank you — send it through.", mood:+3, tag:"Strong", fb:"You met the escalation with evidence, didn't get defensive about a fair point, and helped the stakeholder look credible to their own leadership. That builds an ally." },
+          { good:false, text:"Our environment is secure. You don't need to escalate to your CISO over this.", react:"Don't tell me how to handle my own security governance.", mood:-3, tag:"Weak", fb:"Telling a security lead not to escalate oversteps and dismisses their judgement — it provokes exactly the escalation you're trying to avoid." }
+        ]},
+      { phase:"Resolution & close", scene:"The patch is deployed and verified. You've prepared the remediation summary.", prompt:"How do you close?",
+        choices:[
+          { good:true, text:"The patch is deployed and verified — the vulnerability is closed, with no evidence it was ever exploited. The remediation summary and the controls now in place are attached for your CISO. We've also added [preventive step] so this class of issue is caught earlier. Always here if your team wants to review anything.", react:"Thorough — thank you. This is the kind of response that keeps us confident in the partnership.", mood:+2, tag:"Strong", fb:"Confirmed closure, gave the stakeholder the artifact they need internally, and named a preventive improvement. Closes the loop and strengthens the relationship." },
+          { good:false, text:"Patched and closed. Let us know if there's anything else.", react:"After all that, no summary for our records? We needed the documentation.", mood:-2, tag:"Weak", fb:"A security escalation needs a documented close. A breezy sign-off leaves the stakeholder without what they need for their own audit trail." }
+        ]}
+    ]
+      }
+    ]
+  },
+  {
+    id: "cert-dns",
+    category: "Certificate / domain",
+    variants: [
+      {title: "Production certificate expiring",
+    meta: "Certificate / domain · urgent · shared ownership",
+    opener: "The SSL certificate for our Snowplow collector subdomain is expiring in 36 hours. If it lapses we lose all tracking on production. We need this renewed now — can you sort it?",
+    steps: [
+      { phase:"First contact", scene:"The cert is genuinely urgent, but renewal depends partly on the customer's side (they control the subdomain's DNS). You haven't told them that yet.", prompt:"How do you open?",
+        choices:[
+          { good:true, text:"Thanks for the early heads-up — 36 hours is enough time and we'll treat this as urgent. To set expectations clearly: the renewal needs a validation step in your DNS (which your team controls) plus our side. I'll send the exact records you need now, and we'll move in parallel.", react:"Okay, that makes sense. Send the records and we'll action them right away.", mood:+2, tag:"Strong", fb:"You stated the shared-ownership boundary plainly and factually, then immediately helped across it. Naming where it's stuck beats a defensive 'that's your side.'" },
+          { good:false, text:"That's actually managed on your side — it's your DNS, so it's your responsibility to renew.", react:"So you're just going to leave us to it with production on the line?", mood:-3, tag:"Weak", fb:"Technically true, but it abandons them at the worst moment. Shared responsibility means stating the boundary AND helping across it." },
+          { good:false, text:"We'll renew it. Leave it with us.", react:"Are you sure? Last time there was something we had to do on our end.", mood:-1, tag:"Weak", fb:"Over-promising on something you can't fully control sets up a broken commitment when you hit the DNS validation step they own." }
+        ]},
+      { phase:"Holding pattern", scene:"You've sent the DNS records. The customer has added them but validation is showing as pending, and the clock is ticking.", prompt:"They ask 'is it done yet?' What do you send?",
+        choices:[
+          { good:true, text:"Records received, thank you — validation is propagating now and typically completes within [time]. We're watching it on our side and I'll confirm the moment it validates. We're well inside the 36-hour window, so we're in good shape.", react:"Great, thanks for keeping us posted. We'll stand by.", mood:+2, tag:"Strong", fb:"Confirmed receipt, set a realistic expectation on the pending step, and reassured on timing. Removes the 'is this going to make it?' anxiety." },
+          { good:false, text:"It's pending. Nothing we can do but wait.", react:"With production on the line, 'nothing we can do but wait' is not reassuring.", mood:-2, tag:"Weak", fb:"Even when waiting on propagation, frame it: how long it usually takes, that you're watching, and the time buffer you have. Passive waiting reads as no ownership." }
+        ]},
+      { phase:"De-escalation", scene:"Validation is taking longer than expected and the customer is now worried: \"We're inside 24 hours. If this lapses it's on you. Why is it so slow?\"", prompt:"They're anxious and assigning blame. How do you respond?",
+        choices:[
+          { good:true, text:"I understand the worry with the clock running — let me be concrete. The delay is DNS propagation, which we don't control the speed of, but we still have [X hours] of buffer and a manual fallback if it isn't validated by [time]. I'm monitoring it personally and will not let it lapse.", react:"Okay — knowing there's a fallback and you're on it personally helps a lot.", mood:+3, tag:"Strong", fb:"You acknowledged the worry, explained the real constraint without blame, and gave both a buffer and a fallback plus personal ownership. That defuses the fear." },
+          { good:false, text:"It's slow because of your DNS provider, not us. Nothing we can do about their propagation times.", react:"So now it's our fault? That's not helping us right now.", mood:-3, tag:"Weak", fb:"Even when the constraint genuinely sits on their side, pointing the finger mid-crisis escalates. Name the cause neutrally and focus on the path forward." }
+        ]},
+      { phase:"Resolution & close", scene:"The certificate validated and renewed with hours to spare. Production tracking is safe.", prompt:"How do you close?",
+        choices:[
+          { good:true, text:"Done — the certificate is renewed and production tracking is safe, with hours to spare. To avoid the last-minute scramble next time, I'd suggest we set a renewal reminder 30 days out and pre-stage the DNS records; happy to document that with your team. Glad we caught it early.", react:"Yes please — let's set that up so we're never this close again. Thank you.", mood:+2, tag:"Strong", fb:"Confirmed safety, then turned a near-miss into a preventive improvement. Closing with 'how we stop this recurring' is what separates good from great." },
+          { good:false, text:"Renewed. All good now.", react:"Thanks — though it'd be good to not cut it this fine next time.", mood:0, tag:"Weak", fb:"Not wrong, but a missed opportunity: no preventive step means you'll likely repeat the same 36-hour scramble at the next expiry." }
+        ]}
+    ]
+      }
+    ]
+  },
+  {
+    id: "volume-drop",
+    category: "Volume drop",
+    variants: [
+      {title: "Sudden drop in event volume",
+    meta: "Volume drop · urgent · customer noticed before you did",
+    opener: "We're seeing a sharp drop in events since Friday — almost a 40% decrease. Nothing changed on our side. Something is wrong with the pipeline. Can you investigate urgently?",
+    steps: [
+      { phase:"First contact", scene:"A dramatic-looking drop. You haven't confirmed the cause yet — it could be a real issue or an expected pattern. The customer is alarmed.", prompt:"How do you open?",
+        choices:[
+          { good:true, text:"Thanks for flagging — a 40% drop is significant and we're investigating now. I won't guess at the cause before we have the data, but I'll come back within [time] with what we find. Could you confirm the exact window you first noticed it, to help us pinpoint?", react:"Friday around 2pm. Thanks for taking it seriously.", mood:+2, tag:"Strong", fb:"You took the alarm seriously, committed to investigate without premature guessing, and gave them a concrete way to help. Calm and credible." },
+          { good:false, text:"A drop like that is usually just normal traffic variation. Probably nothing to worry about.", react:"40% is not 'normal variation.' Please actually look into it.", mood:-3, tag:"Weak", fb:"Dismissing a 40% drop as noise, before investigating, is both likely wrong and insulting to a customer who watches their own numbers closely." },
+          { good:false, text:"Did your team deploy any tracking changes recently? This is usually caused by something on the client side.", react:"We told you nothing changed. Stop deflecting and investigate.", mood:-2, tag:"Weak", fb:"Implying it's their fault after they've said it isn't reads as deflection. Ask diagnostic questions neutrally, don't assign cause." }
+        ]},
+      { phase:"Holding pattern", scene:"You've found the cause: a non-obvious one — a bot-filtering change upstream reduced counted events. No data is actually lost.", prompt:"How do you explain it?",
+        choices:[
+          { good:true, text:"We've found it. The drop is real in the counts but not a data problem: a recent bot-filtering change is excluding traffic that was previously counted. Genuine events are intact. I can walk you through the mechanism and the trade-offs of the filter setting.", react:"Ah — that actually makes sense. Yes, walk us through the trade-offs.", mood:+3, tag:"Strong", fb:"You explained a non-obvious mechanism in plain terms, reassured that real data is intact, and offered to discuss the trade-off as a shared decision. Understanding dissolves alarm." },
+          { good:false, text:"It's due to IP-based partitioning interacting with bot filtering at the enrichment layer affecting counted event aggregation.", react:"I don't follow any of that. Is our data broken or not?", mood:-1, tag:"Weak", fb:"Technically accurate but drowns the customer in jargon and never answers their actual question: is my data okay? Lead with the plain-language answer." }
+        ]},
+      { phase:"De-escalation", scene:"The customer is frustrated this wasn't caught proactively: \"So a change reduced our numbers and nobody told us? We make decisions on these numbers.\"", prompt:"It's a fair criticism. How do you respond?",
+        choices:[
+          { good:true, text:"That's a fair point — a change that affects your reported numbers is something you should hear about from us, proactively, not discover yourselves. I'll feed that back so changes like this come with a heads-up. For now, here's exactly what changed and when, so you can adjust any affected reporting.", react:"Appreciated. The proactive heads-up going forward is what matters to us.", mood:+2, tag:"Strong", fb:"You owned the real gap honestly rather than defending it, and committed to a process fix. Owning our part is one of the three strong moves." },
+          { good:false, text:"The change was applied correctly and the filtering is working as intended. There's nothing wrong on our side.", react:"That completely misses my point. The problem is we weren't told.", mood:-3, tag:"Weak", fb:"Defending the technical correctness ignores the actual grievance — the lack of communication. It tells the customer you didn't hear them." }
+        ]},
+      { phase:"Resolution & close", scene:"The customer understands the cause and has decided to keep the bot filter on. You're closing.", prompt:"How do you wrap up?",
+        choices:[
+          { good:true, text:"To recap: the drop reflects bot traffic now being filtered out — your genuine event data is complete and accurate, arguably cleaner than before. You've chosen to keep the filter on, which we'd recommend too. I've noted your account to flag count-affecting changes proactively in future. Shout if the reporting adjustment raises anything.", react:"Clear and helpful — thank you for sticking with it.", mood:+2, tag:"Strong", fb:"Recapped the outcome in plain terms, respected their informed decision, and locked in the proactive-comms fix. A close that rebuilds trust after a stumble." },
+          { good:false, text:"Glad that's cleared up. Closing the ticket.", react:"Okay — just don't let a silent change like that happen again.", mood:-1, tag:"Weak", fb:"Closes the ticket but not the relationship gap. No acknowledgement of the preventive commitment means they're left unsure it won't recur." }
+        ]}
+    ]
+      }
+    ]
+  },
+  {
+    id: "loader-failure",
+    category: "Loader / shredder",
+    variants: [
+      {title: "Loader job stuck, warehouse empty",
+    meta: "Loader / shredder failure · urgent · daily reports blocked",
+    opener: "Our loader looks stuck — nothing has landed in the warehouse since the early hours and our morning reports are blank. The exec team is asking. Can you jump on this?",
+    steps: [
+      { phase:"First contact", scene:"You can see the loader is failing but haven't confirmed why. The customer is under internal pressure from their own leadership.", prompt:"How do you open?",
+        choices:[
+          { good:true, text:"On it now — I can confirm the loader is failing and we're treating this as urgent. The good news up front: this is a load failure, not data loss, so your events are safe and will land once we clear it. I'll update you within 30 minutes with the cause and an ETA for the reprocess.", react:"Thank you — 'not data loss' is exactly what I needed to tell my exec team. Standing by.", mood:+3, tag:"Strong", fb:"You confirmed the issue, immediately removed the worst fear (data loss), and gave the customer something concrete to relay upward. Acknowledges their internal pressure." },
+          { good:false, text:"We'll take a look and get back to you when we know more.", react:"My leadership is asking me right now. I need more than 'we'll take a look.'", mood:-2, tag:"Weak", fb:"No urgency, no reassurance, no timeline — and it ignores the internal pressure they've just told you about. Leaves them empty-handed with their own execs." },
+          { good:false, text:"Loaders fail sometimes, it's usually transient. Try again in a couple of hours.", react:"'Try again in a couple of hours' with blank exec reports? Not acceptable.", mood:-3, tag:"Weak", fb:"Minimising a hard outage and pushing the wait back onto the customer is dismissive when reports are visibly broken and leadership is watching." }
+        ]},
+      { phase:"Holding pattern", scene:"You've found it: a schema change broke the load step. A fix is deploying and the backlog will reprocess once it's in.", prompt:"Your update is due. What do you send?",
+        choices:[
+          { good:true, text:"Cause found: a schema change broke the load step. The fix is deploying now, and once it's live the queued events will reprocess automatically — nothing is lost. I expect the warehouse to start catching up within [time], and I'll confirm when your reports are whole again.", react:"Great, thank you for the clear status. I'll let the team know it's in hand.", mood:+2, tag:"Strong", fb:"Named the cause plainly, confirmed no loss again, and gave a concrete recovery path and ETA. The customer can now manage their own stakeholders." },
+          { good:false, text:"Found the issue, deploying a fix. Will update later.", react:"What was the issue? And when will our reports actually be back?", mood:-1, tag:"Weak", fb:"Better than silence, but withholding the cause and the recovery ETA forces the customer to keep asking — and they have people asking them." }
+        ]},
+      { phase:"De-escalation", scene:"The customer is unhappy about impact: \"This is the second outage this month and our reporting keeps breaking. I need to know you're taking it seriously.\"", prompt:"How do you respond?",
+        choices:[
+          { good:true, text:"You're right to raise it — two in a month isn't the standard you should expect, and I'm not brushing past that. Both traced to schema changes hitting the load step, so beyond today's fix I'll raise adding validation that catches this class of change before it reaches your loader. I'll follow up with what we put in place.", react:"That's what I want to hear — an actual fix for the pattern, not just this instance.", mood:+3, tag:"Strong", fb:"Acknowledged the pattern honestly, connected the two incidents to a real root cause, and committed to a preventive fix. Owning the pattern rebuilds trust." },
+          { good:false, text:"Every outage is different and we resolve them as fast as we can. These things happen with complex pipelines.", react:"'These things happen' is not reassuring when it keeps happening to us.", mood:-3, tag:"Weak", fb:"Treating a repeat pattern as unrelated one-offs, plus 'these things happen,' tells the customer you're not actually addressing why it recurs." }
+        ]},
+      { phase:"Resolution & close", scene:"The fix is live, the backlog reprocessed, and reports are whole again. You've logged a follow-up for preventive validation.", prompt:"How do you close?",
+        choices:[
+          { good:true, text:"You're whole again — the backlog has reprocessed and your reports are complete, with no data lost. Root cause was a schema change breaking the load step. I've logged a follow-up to add validation that catches this before it hits your loader, and I'll share what we implement. Please flag immediately if anything in the reports looks off.", react:"Much appreciated — the preventive follow-up is what'll keep us confident. Thanks.", mood:+2, tag:"Strong", fb:"Confirmed full recovery, named the cause, committed to prevention with a promise to report back, and left the door open. Closes both the ticket and the trust gap." },
+          { good:false, text:"All caught up now, reports should be fine. Closing this out.", react:"Closing already? What's stopping this from happening a third time?", mood:-2, tag:"Weak", fb:"After a repeat outage, closing with no preventive commitment leaves the customer expecting a third. The close needs to address the pattern." }
+        ]}
+    ]
+      }
+    ]
+  },
+  {
+    id: "access-sso",
+    category: "Access / SSO",
+    variants: [
+      {title: "Team locked out — SSO failure",
+    meta: "Access / SSO · urgent · whole team blocked",
+    opener: "None of our team can log in to the console this morning — SSO just rejects everyone. We're completely blocked from our own data. Please help, this is urgent.",
+    steps: [
+      { phase:"First contact", scene:"A full-team lockout. You don't yet know if it's their identity provider, a config change, or something on your side. The customer is blocked and frustrated.", prompt:"How do you open?",
+        choices:[
+          { good:true, text:"Understood — a full lockout is blocking your whole team, so we're treating this as urgent and I'm looking now. To narrow it down fast: did anything change recently on your identity provider side, like a SAML or certificate update? Either way I'll come back within [time] with what I find.", react:"Nothing we're aware of, but I'll check with IT. Thanks for jumping on it.", mood:+2, tag:"Strong", fb:"Acknowledged the impact, committed to act, and asked one targeted diagnostic question framed neutrally — not as blame. Moves things forward." },
+          { good:false, text:"This is almost certainly a problem with your identity provider. You'll need to fix it on your end.", react:"You haven't even looked. Don't pin it on us before investigating.", mood:-3, tag:"Weak", fb:"Assigning the cause to the customer before any investigation is both presumptuous and likely to be wrong — and it abandons a blocked team." },
+          { good:false, text:"Have you tried clearing your browser cache and logging in again?", react:"It's the entire team, on every device. This isn't a cache issue.", mood:-2, tag:"Weak", fb:"Generic tier-one troubleshooting for a full-team outage signals you haven't grasped the scale. Match the response to the severity." }
+        ]},
+      { phase:"Holding pattern", scene:"You've traced it: an expired SAML certificate on the integration. The fix is straightforward but needs a coordinated step with their IT.", prompt:"What do you send?",
+        choices:[
+          { good:true, text:"Found it: the SAML signing certificate on the SSO integration expired overnight, which is why everyone's rejected. The fix is quick — I'll need your IT to update the certificate on their side, and I'll do our side in parallel. Sending the exact steps now; we can have your team back in shortly.", react:"That makes sense — sending this to IT right now. Thank you for pinpointing it.", mood:+3, tag:"Strong", fb:"Named the precise cause, explained the shared fix without blame, and gave a clear path with a hopeful ETA. Turns a scary lockout into a known, fixable task." },
+          { good:false, text:"It's a certificate thing on the SSO. Your IT will need to sort it out.", react:"Which certificate? What exactly do they need to do? 'Sort it out' isn't enough.", mood:-1, tag:"Weak", fb:"Right diagnosis, but vague hand-off. Without the specific steps, you've just moved the blockage to their IT without helping them clear it." }
+        ]},
+      { phase:"De-escalation", scene:"An hour in, the customer is escalating: \"We've been locked out of our own platform for hours and losing productivity. This shouldn't be possible.\"", prompt:"They're frustrated about the impact. How do you respond?",
+        choices:[
+          { good:true, text:"You're right, and I'm sorry for the disruption — being locked out of your own platform is a serious impact. The certificate fix is in progress with your IT now and we're close. To stop this recurring, I'll set up expiry monitoring on the SSO certificate so we catch it weeks ahead next time, not at lockout.", react:"Thank you — the monitoring is exactly the kind of thing that should already exist. Glad it will.", mood:+3, tag:"Strong", fb:"Apologised for the genuine impact, gave a clear status, and committed to preventive monitoring so it can't recur silently. Owns it without grovelling." },
+          { good:false, text:"Certificates expire, it's a routine part of SSO. There's not much we could have done.", react:"You could have monitored the expiry date. That's the whole point.", mood:-3, tag:"Weak", fb:"Calling a preventable, monitorable expiry 'routine' and shrugging off responsibility is exactly what a frustrated customer can't accept." }
+        ]},
+      { phase:"Resolution & close", scene:"The certificate is updated, SSO is working, and the team is back in. You've set up expiry monitoring.", prompt:"How do you close?",
+        choices:[
+          { good:true, text:"Your team's back in — SSO is working and confirmed across accounts. Cause was an expired SAML certificate; the fix was updating it on both sides. I've now added expiry monitoring so we'll flag the next renewal well ahead of time. Apologies again for the morning's disruption — shout if anyone still has trouble logging in.", react:"All good on our side now. Really appreciate the monitoring fix — thank you.", mood:+2, tag:"Strong", fb:"Confirmed resolution across the team, named the cause, delivered the preventive fix, and apologised once more for impact. A complete, trust-restoring close." },
+          { good:false, text:"SSO's working again. Closing the ticket.", react:"Fine — but please make sure this expiry is actually being tracked now.", mood:-1, tag:"Weak", fb:"Working again isn't the same as resolved-for-good. Without confirming the monitoring, the customer is left to worry about the next silent expiry." }
+        ]}
+    ]
+      }
+    ]
+  },
+  {
+    id: "data-quality",
+    category: "Data quality / schema",
+    variants: [
+      {title: "Spike in failed events",
+    meta: "Data quality / schema · high · trust in the data shaken",
+    opener: "We're suddenly seeing a big spike in failed events — thousands an hour since last night. We rely on this data being clean. What's going on and how much are we losing?",
+    steps: [
+      { phase:"First contact", scene:"A failed-event spike, and the customer's real worry is data integrity. You haven't scoped it yet.", prompt:"How do you open?",
+        choices:[
+          { good:true, text:"Thanks for flagging — a spike like that absolutely warrants investigation and I'm on it. To scope it precisely: can you confirm roughly when it started and whether it's one event type or several? That'll let me pinpoint whether it's a schema mismatch or something broader. I'll report back within [time].", react:"Started around 11pm, and it looks like mostly our checkout events. Thanks.", mood:+2, tag:"Strong", fb:"Validated the concern, asked sharp scoping questions instead of guessing, and set a clear next step. Structured triage signals competence." },
+          { good:false, text:"Some failed events are normal — every pipeline has a baseline failure rate. Probably nothing serious.", react:"This is thousands an hour, not a baseline. Please take it seriously.", mood:-3, tag:"Weak", fb:"Waving off a clear spike as 'baseline' dismisses a customer whose trust in their data is the whole issue. Don't minimise before scoping." },
+          { good:false, text:"Failed events are usually caused by tracking code on your side. Have you changed anything?", react:"Maybe — but you could at least look before assuming it's us.", mood:-2, tag:"Weak", fb:"Even though a tracking change is a plausible cause, leading with 'it's probably you' before investigating reads as deflection." }
+        ]},
+      { phase:"Holding pattern", scene:"You've scoped it: a schema change on their checkout event is causing validation failures. The events are captured as failed, not lost, and are recoverable.", prompt:"What do you send?",
+        choices:[
+          { good:true, text:"Scoped it: a recent schema change on your checkout event is causing the validation failures, which is why it's concentrated there. Important: these events are captured as failed events, not lost — they're recoverable once we align the schema. I'll outline the two options (update the schema, or adjust the tracking) so you can choose.", react:"That's a relief that they're recoverable. Let's see the options.", mood:+3, tag:"Strong", fb:"Pinpointed the cause, removed the data-loss fear with an accurate 'failed, not lost,' and framed the fix as a choice. Restores confidence in the data." },
+          { good:false, text:"It's a schema validation issue. You'll need to fix your tracking to match the schema.", react:"Are those events gone? And which schema, exactly? I need specifics.", mood:-1, tag:"Weak", fb:"Skips the customer's central question — are we losing data? — and hands back a vague fix. The reassurance about recoverability is the most important part." }
+        ]},
+      { phase:"De-escalation", scene:"The customer is rattled about trust: \"If events can silently fail like this, how do we trust any of our numbers? This is our checkout data.\"", prompt:"They're questioning the reliability of the whole pipeline. How do you respond?",
+        choices:[
+          { good:true, text:"That's a completely fair concern, and checkout data is exactly where you need confidence. The key point: nothing failed silently — the pipeline flagged these as failed events, which is the system working as designed to protect your clean data rather than letting bad data through. Once we realign the schema and recover them, your numbers will be whole. I'll show you how to monitor failed events so you have visibility too.", react:"Okay — framed that way, the failing is actually the safeguard. And I'd like that monitoring.", mood:+3, tag:"Strong", fb:"Reframed the failure as the safeguard doing its job (accurately), reassured on recovery, and offered the customer their own visibility. Turns fear into understanding." },
+          { good:false, text:"The data is fine, you're overreacting. The system is working as it should.", react:"Don't tell me I'm overreacting about our checkout data.", mood:-3, tag:"Weak", fb:"Calling a customer's data-integrity concern an overreaction is dismissive and condescending — it deepens exactly the distrust you need to resolve." }
+        ]},
+      { phase:"Resolution & close", scene:"The schema is realigned, the failed events recovered, and validation is back to baseline. You've shown them the failed-events dashboard.", prompt:"How do you close?",
+        choices:[
+          { good:true, text:"Resolved — the schema's realigned, the failed checkout events have been recovered, and validation is back to baseline. Nothing was lost. You now have access to the failed-events view so you can see the health of your data directly, and I'd suggest a quick check before any future tracking change. Always here if a spike ever reappears.", react:"This was genuinely reassuring to work through — thank you for the visibility.", mood:+2, tag:"Strong", fb:"Confirmed recovery and zero loss, gave the customer lasting visibility, and a preventive habit. Closes by leaving them more in control than before." },
+          { good:false, text:"Schema's fixed and the failures stopped. Closing this out.", react:"Thanks — though I'd still like to understand how to spot this earlier.", mood:-1, tag:"Weak", fb:"Fixes the instance but misses the chance to give the customer the monitoring and confidence they were really asking for." }
+        ]}
+    ]
+      }
+    ]
+  }
+];
+
+const PRACTICE_OUTRO = {
+  high: { h:"Held the relationship under pressure", p:"You worked all four phases the way the framework intends — committing to next steps, leading with what's true, owning our part, and closing with prevention. This is exactly what 'confidence in front of the customer' looks like." },
+  mid:  { h:"Solid, with room to sharpen", p:"You got the customer through it, but a couple of replies drifted toward the weak column. Re-read the language bank for the phases where the mood dipped — the strong move was usually to commit, name something concrete, or own our part." },
+  low:  { h:"The relationship took damage", p:"Several replies were vague, defensive, or dismissive — the moves that escalate rather than de-escalate. Work back through the framework and language bank: every strong reply commits to a next step, names something concrete, or owns our part honestly." }
+};
+
+(function(){
+  const stage = document.getElementById("practice-stage");
+  if(!stage) return;
+  let stepIdx = 0, mood = 50, score = 0, chat = [];
+  let lastScenarioIdx = -1, P = null;
+
+  // Each PRACTICE_SCENARIOS entry is a scenario group with .variants[].
+  // pickScenario chooses a different group than last time (no-repeat), then a
+  // random variant within it so a repeated category is rephrased.
+  function pickScenario(){
+    let idx;
+    if(PRACTICE_SCENARIOS.length <= 1){ idx = 0; }
+    else { do { idx = Math.floor(Math.random()*PRACTICE_SCENARIOS.length); } while(idx === lastScenarioIdx); }
+    lastScenarioIdx = idx;
+    const group = PRACTICE_SCENARIOS[idx];
+    const variants = group.variants || [group];
+    P = variants[Math.floor(Math.random()*variants.length)];
+  }
+  function resetRun(){ pickScenario(); stepIdx=0; mood=50; score=0; chat=[{who:"cust", text:P.opener}]; render(); }
+  function moodFace(m){ return m>=70?"🙂":m>=45?"😐":m>=25?"😟":"😠"; }
+  function moodColor(m){ return m>=70?"var(--res-c)":m>=45?"var(--hold-c)":"var(--weak-tx)"; }
+
+  function resetBarHTML(){
+    return '<div class="pr-resetbar"><span class="pr-scenario-name">'+P.title+
+      ' <span class="pr-scenario-meta">· '+P.meta+'</span></span>'+
+      '<button class="pr-reset" id="pr-reset">↺ Reset · new scenario</button></div>';
+  }
+
+  function render(){
+    const step = P.steps[stepIdx];
+    let html = '<div class="pr-wrap">';
+    html += resetBarHTML();
+    // phase progress bar
+    html += '<div class="pr-phasebar">';
+    P.steps.forEach((s,i)=>{ html += '<div class="seg" style="background:'+(i<stepIdx?'var(--purple)':i===stepIdx?'var(--purple-bright)':'var(--line2)')+'"></div>'; });
+    html += '</div>';
+    // mood meter
+    html += '<div class="pr-mood"><span class="lbl">Customer</span>'+
+            '<div class="bar"><div class="fill" style="width:'+mood+'%; background:'+moodColor(mood)+'"></div></div>'+
+            '<span class="face">'+moodFace(mood)+'</span></div>';
+    // chat history
+    html += '<div class="pr-chat">';
+    chat.forEach(m=>{
+      html += '<div class="pr-msg '+(m.who==="cust"?"pr-cust":"pr-you")+'">'+
+              '<p class="pr-who">'+(m.who==="cust"?"Customer":"You")+'</p>'+m.text+'</div>';
+    });
+    html += '</div>';
+    // current phase label + scene
+    html += '<p class="pr-who" style="color:var(--purple-d)">Phase '+(stepIdx+1)+' · '+step.phase+'</p>';
+    html += '<p class="pr-scene">'+step.scene+'</p>';
+    html += '<p class="pr-prompt">'+step.prompt+'</p>';
+    // choices (shuffled so the strong one isn't always first)
+    html += '<div class="pr-choices" id="pr-choices">';
+    const order = step.choices.map((c,i)=>i);
+    for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
+    order.forEach(ci=>{
+      html += '<button class="pr-choice" data-ci="'+ci+'">'+step.choices[ci].text+'</button>';
+    });
+    html += '</div><div id="pr-fb"></div>';
+    html += '</div>';
+    stage.innerHTML = html;
+    document.getElementById("pr-reset").addEventListener("click", resetRun);
+    document.querySelectorAll(".pr-choice").forEach(b=>{
+      b.addEventListener("click", ()=>choose(parseInt(b.dataset.ci), b));
+    });
+  }
+
+  function choose(ci, btn){
+    const step = P.steps[stepIdx];
+    const c = step.choices[ci];
+    document.querySelectorAll(".pr-choice").forEach(b=>{ b.disabled=true; });
+    btn.classList.add(c.good?"picked-good":"picked-bad");
+    mood = Math.max(0, Math.min(100, mood + c.mood*10));
+    if(c.good) score++;
+    chat.push({who:"you", text:c.text});
+    chat.push({who:"cust", text:c.react});
+    const fb = document.getElementById("pr-fb");
+    fb.innerHTML = '<div class="pr-fb '+(c.good?"good":"bad")+'">'+
+      '<span class="fb-tag">'+c.tag+'</span>'+c.fb+
+      '<div><button class="pr-btn" id="pr-next">'+(stepIdx<P.steps.length-1?"Continue →":"See how you did")+'</button></div></div>';
+    document.getElementById("pr-next").addEventListener("click", ()=>{
+      stepIdx++;
+      if(stepIdx<P.steps.length) render(); else finish();
+    });
+    fb.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  function finish(){
+    const n = P.steps.length;
+    const band = score>=n ? PRACTICE_OUTRO.high : score>=Math.ceil(n/2) ? PRACTICE_OUTRO.mid : PRACTICE_OUTRO.low;
+    stage.innerHTML = '<div class="pr-wrap">'+resetBarHTML()+'<div class="pr-result">'+
+      '<div class="pr-mood" style="justify-content:center; border:none; background:transparent; margin-bottom:0">'+
+      '<span class="lbl">Final customer mood</span><span class="face" style="font-size:28px">'+moodFace(mood)+'</span></div>'+
+      '<div class="score">'+score+' / '+n+'</div>'+
+      '<h3>'+band.h+'</h3><p>'+band.p+'</p>'+
+      '<button class="pr-btn ghost" id="pr-restart">Try this scenario again</button> '+
+      '<button class="pr-btn" id="pr-new">New scenario</button></div></div>';
+    document.getElementById("pr-reset").addEventListener("click", resetRun);
+    document.getElementById("pr-new").addEventListener("click", resetRun);
+    document.getElementById("pr-restart").addEventListener("click", ()=>{
+      stepIdx=0; mood=50; score=0; chat=[{who:"cust", text:P.opener}]; render();
+    });
+  }
+
+  // init
+  pickScenario();
+  chat=[{who:"cust", text:P.opener}];
+  render();
+})();
+</script>
+</body>
+</html>
